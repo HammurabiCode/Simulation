@@ -1,19 +1,27 @@
 #ifndef PARTICLE_H_H
 #define PARTICLE_H_H
 #include "vect.h"
-#include "common.h"
 typedef struct{
+  float radius;
+  vect position;
+  vect velocity;
+  vect force;
+	/*
   ParticleIndex index;
   float mass;
-  float radius;
   float density;
   float young;
   float poission;
-  vect position;
-  vect velocity;
-  vect acceleration;
+	*/
 } Particle;
 
 void InitParticleA(Particle *p_list, unsigned num);
+void InitParticle(Particle *, const vect *, float);
+void ComputeParticleForce(Particle *, Particle *);
+static inline
+void UpdateParticlePosition(Particle *ip, float ts)
+{
+  scaleAddVect(ip->position, ip->velocity, ts);
+}
 
 #endif

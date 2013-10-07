@@ -42,11 +42,11 @@ void FreeHashGrid(HashGrid *hg)
 }
 
 //-------------------------------------------------------------------------
-void InitHashTable(HashTable *ht, unsigned ts, const vect* min_p, float cl)
+void InitHashTable(HashTable *ht, unsigned ts, const vect min_p, float cl)
 {
   ht->table_size = ts;
   ht->cell_length = cl;
-  copyVect(&(ht->min_pos), min_p);
+  copyVect((ht->min_pos), min_p);
   if(ht->content != NULL)
   {
     free(ht->content);
@@ -54,7 +54,7 @@ void InitHashTable(HashTable *ht, unsigned ts, const vect* min_p, float cl)
   ht->content = (HashGrid*)malloc(sizeof(HashGrid)*ht->table_size);
 }
 //-------------------------------------
-void InsertHashTable(HashTable *ht, const Particle *p)
+void InsertHashTable(HashTable *ht, const Granular *p)
 {
   unsigned hv = HASH_VALUE(p->position, ht->min_pos, ht->cell_length, ht->table_size);
   InsertHashGrid(ht->content+hv, p->index);
