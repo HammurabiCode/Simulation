@@ -8,7 +8,7 @@ all : $(EXECUTABLE)
 
 $(EXECUTABLE) : $(OBJ)
 	gcc -o $(EXECUTABLE) $(OBJ) -lm -std=$(C_STD)
-main.o : main.c vect.h particle.h
+main.o : main.c vect.h Particle.h
 	gcc -o main.o -c main.c -lm -std=$(C_STD)
 hash.o : HashTable.c HashTable.h vect.o Granular.o
 	gcc -o hash.o -c HashTable.c -lm -std=$(C_STD)
@@ -16,8 +16,8 @@ Demon.o : demon.c Granular.h vect.o Granular.o
 	gcc -o Demon.o -c demon.c -lm -std=$(C_STD)
 Granular.o : Granular.c Granular.h vect.o Particle.o mat.o
 	gcc -o Granular.o -c Granular.c -lm -std=$(C_STD)
-Particle.o : particle.c particle.h coef.h vect.o
-	gcc -o Particle.o -c particle.c -lm -std=$(C_STD)
+Particle.o : Particle.c Particle.h coef.h vect.o
+	gcc -o Particle.o -c Particle.c -lm -std=$(C_STD)
 mat.o : mat.c mat.h vect.h vect.o
 	gcc -o mat.o -c mat.c -lm -std=$(C_STD)
 vect.o : vect.c vect.h

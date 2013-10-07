@@ -1,7 +1,7 @@
 #ifndef GRANULAR_H_H
 #define GRANULAR_H_H
 
-#include "particle.h"
+#include "Particle.h"
 #include "vect.h"
 #include "mat.h"
 #include "quat.h"
