@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "Demon.h"
 #include "vect.h"
 #include "HashTable.h"
@@ -95,7 +96,7 @@ void SaveDemon(const Demon *dem_ptr, FILE *fp)
   fprintf(fp, "#declare %s = union {\n\t", obj_name);
   for(unsigned i = 0; i < dem_ptr->num; i++) {
     for(unsigned j = 0; j < dem_ptr->sand[i].num; j++) {
-      const particle *p = &(dem_ptr->sand[i].component[j]);
+      const Particle *p = &(dem_ptr->sand[i].component[j]);
       fprintf(fp, "sphere {\n\t<%f, %f, %f>, %f\n\ttexture {pigment{color Gray}}\n}\n",
           p->position[0], p->position[1], p->position[2], p->radius);
     }

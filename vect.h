@@ -74,7 +74,7 @@ static inline void substractVectTo(vect v, const vect v1, const vect v2)
 //-------------------------------------------------------------------------
 static inline void substractVect(vect v, const vect v0)
 {
-  substractTo(v, v, v0);
+  substractVectTo(v, v, v0);
 }
 //-------------------------------------------------------------------------
 static inline void scaleVectTo(vect v, const vect v0, float s)
@@ -92,7 +92,7 @@ static inline float getVectDistance(const vect v1, const vect v2)
 { 
   vect t;
   substractVectTo(t, v1, v2);
-  return getLength(t);
+  return getVectLength(t);
 }
 //-------------------------------------------------------------------------
 static inline float normalizeVect(vect a)

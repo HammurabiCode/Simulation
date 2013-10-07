@@ -18,6 +18,8 @@ Granular.o : Granular.c Granular.h vect.o Particle.o mat.o
 	gcc -o Granular.o -c Granular.c -lm -std=$(C_STD)
 Particle.o : Particle.c Particle.h coef.h vect.o
 	gcc -o Particle.o -c Particle.c -lm -std=$(C_STD)
+quat.o : quat.c quat.h vect.h vect.o
+	gcc -o quat.o -c quat.c -lm -std=$(C_STD)
 mat.o : mat.c mat.h vect.h vect.o
 	gcc -o mat.o -c mat.c -lm -std=$(C_STD)
 vect.o : vect.c vect.h

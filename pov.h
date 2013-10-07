@@ -1,8 +1,8 @@
 #ifndef POV_H_H
 #define POV_H_H
 #include <stdio.h>
-#incldue "vect.h"
-#incldue "Demon.h"
+#include "vect.h"
+#include "Demon.h"
 //-------------------------------------------------------------------------
 typedef struct {
   vect location;
@@ -18,13 +18,13 @@ typedef struct {
   vect location;
   char color[8];
 } pov_plane;
-typedef (char*) pov_include;
+typedef char* pov_include;
 //-------------------------------------------------------------------------
 typedef struct {
   pov_camera camera;
   pov_light *lights;
   unsigned num_light;
-  pov_include *includes;
+  pov_include *include;
   unsigned num_include;
   Demon *dem_scene;
 } pov;
@@ -84,24 +84,25 @@ povAddLight(pov *p, const pov_light* lig)
   } else {
     p->include = (pov_light*)malloc(sizeof(pov_light));
   }
-  int new_size = sizeof(char)*(strlen(lig)+1);
   p->num_light++;
-  p->include[0] = (pov_light)malloc(sizeof(pov_light));
   memcpy(p->include, lig, sizeof(pov_light));
 }
 //-------------------------------------------------------------------------
+static
 void povSave(const pov *p, const char *filename)
 {
   FILE *fp = fopen(filename, "wt");
   for(unsigned i = 0; i < p->num_include; i++) {
-    includeSave(p->includes[i], fp);
+    includeSave(p->include[i], fp);
   }
   for(unsigned i = 0; i < p->num_light; i++) {
-    lightSave(p->lights[i], fp);
+    lightSave(p->lights+i, fp);
   }
   cameraSave(&(p->camera), fp);
   SaveDemon(&(p->dem_scene), fp);
   fclose(fp);
 }
+/*
+*/
 //-------------------------------------------------------------------------
 #endif

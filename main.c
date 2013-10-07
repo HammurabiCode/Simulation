@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include "vect.h"
 #include "coef.h"
-#include "particle.h"
+#include "Particle.h"
+#include "Demon.h"
+#include "pov.h"
 /*
 float GetKr(const Particle *p1, const Particle *p2)
 {
@@ -19,5 +21,14 @@ const static unsigned PART_NUM = 2;
 
 int main(int argc, char *argv[])
 {
+	Demon d1;
+	InitDemon(&d1);
+	pov pov1;
+	setVectValue(&(pov1.camera.location), 10, 10, 10);
+	setVectValue(&(pov1.camera.lookAt), 0, 0, 0);
+	pov_light light1;
+	setVectValue(&(light1.location), 10, 10, 10);
+	povAddLight(&pov1, &light1);
+
   return 0;
 }
