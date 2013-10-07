@@ -12,8 +12,8 @@ main.o : main.c vect.h Particle.h
 	gcc -o main.o -c main.c -lm -std=$(C_STD)
 hash.o : HashTable.c HashTable.h vect.o Granular.o
 	gcc -o hash.o -c HashTable.c -lm -std=$(C_STD)
-Demon.o : demon.c Granular.h vect.o Granular.o
-	gcc -o Demon.o -c demon.c -lm -std=$(C_STD)
+Demon.o : Demon.c Granular.h vect.o Granular.o
+	gcc -o Demon.o -c Demon.c -lm -std=$(C_STD)
 Granular.o : Granular.c Granular.h vect.o Particle.o mat.o
 	gcc -o Granular.o -c Granular.c -lm -std=$(C_STD)
 Particle.o : Particle.c Particle.h coef.h vect.o

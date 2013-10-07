@@ -1,4 +1,4 @@
-#include "demon.h"
+#include "Demon.h"
 #include "vect.h"
 #include "HashTable.h"
 #include "Granular.h"

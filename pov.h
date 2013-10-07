@@ -2,7 +2,7 @@
 #define POV_H_H
 #include <stdio.h>
 #incldue "vect.h"
-#incldue "demon.h"
+#incldue "Demon.h"
 //-------------------------------------------------------------------------
 typedef struct {
   vect location;
