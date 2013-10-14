@@ -17,5 +17,6 @@ void InitDemon(Demon*);
 void ComputeForce(Demon*);
 void TimeIntergration(Demon *);
 void SaveDemon(const Demon * , FILE *);
+void FreeDemon(Demon *);
 
 #endif

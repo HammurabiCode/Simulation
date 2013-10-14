@@ -29,7 +29,7 @@ void InitDemon(Demon *dem_ptr)
         1.0f,
         (ip+1)*dem_ptr->max_radius,
         1.0f);
-    InitBoxGranular(dem_ptr+ip, pos, boxBigR, boxSmallR, granDensity); 
+    InitBoxGranular(dem_ptr->sand+ip, pos, boxBigR, boxSmallR, granDensity); 
   }
   InitDemonHT(dem_ptr);
 }
@@ -97,11 +97,19 @@ void SaveDemon(const Demon *dem_ptr, FILE *fp)
   for(unsigned i = 0; i < dem_ptr->num; i++) {
     for(unsigned j = 0; j < dem_ptr->sand[i].num; j++) {
       const Particle *p = &(dem_ptr->sand[i].component[j]);
-      fprintf(fp, "sphere {\n\t<%f, %f, %f>, %f\n\ttexture {pigment{color Gray}}\n}\n",
+      fprintf(fp, "sphere {\n\t<%f, %f, %f>, %f\n\ttexture {pigment{color Brown}}\n}\n",
           p->position[0], p->position[1], p->position[2], p->radius);
     }
   }
   fprintf(fp, "}\n");
   fprintf(fp, "object {\n\t%s\n\ttranslate <%f, %f, %f>\n\trotate <%f, %f, %f>\n}\n",
       obj_name, 0, 0, 0, 0, 0, 0);
+}
+void FreeDemon(Demon *dem_ptr) {
+	if(dem_ptr == NULL) return;
+	FreeHashTable(&(dem_ptr->sand_ht));
+	for(unsigned is = 0; is < dem_ptr->num; is ++) {
+		FreeGranular(&(dem_ptr->sand[is]));
+	}
+	free(dem_ptr->sand);
 }

@@ -23,12 +23,17 @@ int main(int argc, char *argv[])
 {
 	Demon d1;
 	InitDemon(&d1);
+
 	pov pov1;
 	setVectValue(&(pov1.camera.location), 10, 10, 10);
 	setVectValue(&(pov1.camera.lookAt), 0, 0, 0);
 	pov_light light1;
 	setVectValue(&(light1.location), 10, 10, 10);
+	lightSetColor(&light1, "White");
 	povAddLight(&pov1, &light1);
+	povAddInclude(&pov1, "colors");
+	pov1.dem_scene = &d1;
+	povSave(&pov1, "1.pov");
 
   return 0;
 }

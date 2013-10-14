@@ -24,17 +24,17 @@ void InitBoxGranular(Granular *gran, const vect pos,
   //--------------------------------
   InitParticle(gran->component, pos, bigR);
 	setVectZero((gran->offset));
-  float dist = bigR + smallR;
+  float dist = (bigR + smallR)*0.5*sqrt(2.0);
   for(unsigned i = 1; i < 9; i++)
   {
     int x, y, z;
-    x = ((i&0x01) == 0) ? 1 : -1;
-    y = ((i&0x02) == 0) ? 1 : -1;
-    z = ((i&0x04) == 0) ? 1 : -1;
+    x = (((i-1)&0x01) == 0) ? 1 : -1;
+    y = (((i-1)&0x02) == 0) ? 1 : -1;
+    z = (((i-1)&0x04) == 0) ? 1 : -1;
     setVectValue((gran->offset+i), x*dist, y*dist, z*dist);
     vect offset;
     addVectTo(offset, pos, gran->offset[i]);
-    InitParticle(gran->component+i+1, offset, smallR);
+    InitParticle(gran->component+i, offset, smallR);
   }
 }
 

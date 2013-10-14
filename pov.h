@@ -32,7 +32,7 @@ typedef struct {
 static inline void 
 cameraSave(const pov_camera *cam, FILE * fp)
 {
-  fprintf(fp, "camera {\n\tlocation <%f, %f, %f>\n\tlook_at <%f, %f, %f>\n}",
+  fprintf(fp, "camera {\n\tlocation <%f, %f, %f>\n\tlook_at <%f, %f, %f>\n}\n",
       cam->location[0], cam->location[1], cam->location[2],
       cam->lookAt[0], cam->lookAt[1], cam->lookAt[2]);
 }
@@ -40,9 +40,14 @@ cameraSave(const pov_camera *cam, FILE * fp)
 static inline void 
 lightSave(const pov_light *l, FILE * fp)
 {
-  fprintf(fp, "light_source {\n\t<%f, %f, %f>\n\tcolor %s\n}",
+  fprintf(fp, "light_source {\n\t<%f, %f, %f>\n\tcolor %s\n}\n",
       l->location[0], l->location[1], l->location[2],
       l->color);
+}
+static inline void 
+lightSetColor(pov_light *l, const char* c)
+{
+	memcpy(l->color, c, sizeof(char)*strlen(c)+1);
 }
 //-------------------------------------------------------------------------
 static inline void 
@@ -67,25 +72,25 @@ povAddInclude(pov *p, const char* inc)
   } else {
     p->include = (pov_include*)malloc(sizeof(pov_include));
   }
-  p->num_light++;
+  p->num_include++;
   int new_size = sizeof(char)*(strlen(inc)+1);
   p->include[0] = (pov_include)malloc(new_size);
-  memcpy(p->include, inc, new_size);
+  memcpy(p->include[0], inc, new_size);
 }
 static inline void 
 povAddLight(pov *p, const pov_light* lig)
 {
   if(p->num_light != 0) {
     int old_size = sizeof(pov_light)*(p->num_light);
-    pov_light *new_includes = (pov_light*)malloc(old_size+sizeof(pov_light));
-    memcpy(new_includes+1, p->include, old_size);
-    free(p->include);
-    p->include = new_includes;
+    pov_light *new_lights= (pov_light*)malloc(old_size+sizeof(pov_light));
+    memcpy(new_lights+1, p->lights, old_size);
+    free(p->lights);
+    p->lights = new_lights;
   } else {
-    p->include = (pov_light*)malloc(sizeof(pov_light));
+    p->lights = (pov_light*)malloc(sizeof(pov_light));
   }
   p->num_light++;
-  memcpy(p->include, lig, sizeof(pov_light));
+  memcpy(p->lights, lig, sizeof(pov_light));
 }
 //-------------------------------------------------------------------------
 static
@@ -99,10 +104,13 @@ void povSave(const pov *p, const char *filename)
     lightSave(p->lights+i, fp);
   }
   cameraSave(&(p->camera), fp);
-  SaveDemon(&(p->dem_scene), fp);
-  fclose(fp);
-}
+	if(p->dem_scene != NULL) {
+		SaveDemon(p->dem_scene, fp);
+	}
+	fprintf(fp, "plane {\n\t<0, 1, 0>, -1\n\tpigment {checker color Black, color White}\n}\n");
 /*
 */
+  fclose(fp);
+}
 //-------------------------------------------------------------------------
 #endif
