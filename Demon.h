@@ -13,7 +13,8 @@ typedef struct
 } Demon;
 
 void InitDemonHT(Demon*);
-void InitDemon(Demon*);
+void InitDemon2Gran(Demon*);
+void InitDemonBox(Demon*, const vect, unsigned, unsigned, unsigned);
 void ComputeForce(Demon*);
 void TimeIntergration(Demon *);
 void SaveDemon(const Demon * , FILE *);

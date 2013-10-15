@@ -5,6 +5,7 @@
 #define NULL (0)
 #endif
 #define ZERO (1.0e-10)
+#define PI (3.1415926535358979)
 
 typedef float real;
 typedef float vect[3];

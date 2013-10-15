@@ -21,10 +21,24 @@ const static unsigned PART_NUM = 2;
 
 int main(int argc, char *argv[])
 {
+  /*
+  mat3x3 matOne, matOneInv, matMul;
+  matOne[0][0] = 1; matOne[0][1] = 2; matOne[0][2] = 3;
+  matOne[1][0] = 2; matOne[1][1] = 2; matOne[1][2] = 1;
+  matOne[2][0] = 3; matOne[2][1] = 4; matOne[2][2] = 3;
+  matInv(matOneInv, matOne);
+  matMulMat(matMul, matOne, matOneInv);
+  matPrint(matMul);
+  */
 	Demon d1;
-	InitDemon(&d1);
+	//InitDemon2Gran(&d1);
+  vect or;
+  setVectValue(or, 1.0, 1.0, 1.0);
+	InitDemonBox(&d1, or, 4, 4, 4);
 
 	pov pov1;
+  pov1.num_light = 0;
+  pov1.num_include= 0;
 	setVectValue(&(pov1.camera.location), 10, 10, 10);
 	setVectValue(&(pov1.camera.lookAt), 0, 0, 0);
 	pov_light light1;
@@ -35,5 +49,6 @@ int main(int argc, char *argv[])
 	pov1.dem_scene = &d1;
 	povSave(&pov1, "1.pov");
 
+  FreeDemon(&d1);
   return 0;
 }

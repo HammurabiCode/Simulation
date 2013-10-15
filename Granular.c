@@ -3,14 +3,18 @@
 #include "mat.h" 
 #include "quat.h"
 
-//-------------------------------------------------------------------------
+//----------------------------------------------------------------
 void InitBoxGranular(Granular *gran, const vect pos,
 		float bigR, float smallR, float density)
 {
+	gran->density = density;
+	gran->mass = PI*4.0*(bigR*bigR*bigR + smallR*smallR*smallR*8)/3.0;
   //--------------------------------
   //quatenion inertia
   copyVect((gran->position), pos);
+  setVectZero((gran->velocity));
   setVectZero((gran->acceleration));
+  setVectZero((gran->angularVelocity));
   setVectZero((gran->angularMomentum));
 
   //--------------------------------
@@ -21,10 +25,9 @@ void InitBoxGranular(Granular *gran, const vect pos,
   gran->num = 9;
   gran->component = (Particle*)malloc(sizeof(Particle)*gran->num);
   gran->offset = (vect*)malloc(sizeof(vect)*gran->num);
-  //--------------------------------
   InitParticle(gran->component, pos, bigR);
-	setVectZero((gran->offset));
-  float dist = (bigR + smallR)*0.5*sqrt(2.0);
+	setVectZero(gran->offset);
+  float dist = (bigR + smallR)/sqrt(3.0);
   for(unsigned i = 1; i < 9; i++)
   {
     int x, y, z;
@@ -36,6 +39,11 @@ void InitBoxGranular(Granular *gran, const vect pos,
     addVectTo(offset, pos, gran->offset[i]);
     InitParticle(gran->component+i, offset, smallR);
   }
+  //--------------------------------
+	setQuatZero(&(gran->quaternion));
+	gran->quaternion[0] = 1.0f;
+	InitGranularInertia(gran);
+  //--------------------------------
 }
 
 void ComputeGranularForce(Granular *iG, Granular *jG)
@@ -78,6 +86,30 @@ void GranularTimeIntergration(Granular *iG, float time_step)
     UpdateParticlePosition(iG->component+ip, time_step);
   }
 	return;
+}
+void InitGranularInertia(Granular *gran) {
+	mat3x3 inertia;
+	matSetZero(inertia);
+	for(unsigned ip = 0; ip < gran->num; ip ++) {
+		const Particle *p = gran->component+ip;
+		float m = p->radius*p->radius*p->radius;
+		inertia[0][0] += m*(gran->offset[ip][2]*gran->offset[ip][2]
+				+ gran->offset[ip][1]*gran->offset[ip][1]);
+		inertia[0][1] += -m*gran->offset[ip][0]*gran->offset[ip][1];
+		inertia[0][2] += -m*gran->offset[ip][0]*gran->offset[ip][2];
+
+		inertia[1][0] += -m*gran->offset[ip][0]*gran->offset[ip][1];
+		inertia[1][1] += m*(gran->offset[ip][0]*gran->offset[ip][0]
+				+ gran->offset[ip][2]*gran->offset[ip][2]);
+		inertia[1][2] += -m*gran->offset[ip][1]*gran->offset[ip][2];
+
+		inertia[2][0] += -m*gran->offset[ip][0]*gran->offset[ip][2];
+		inertia[2][1] += -m*gran->offset[ip][1]*gran->offset[ip][2];
+		inertia[2][2] += m*(gran->offset[ip][0]*gran->offset[ip][0]
+				+ gran->offset[ip][1]*gran->offset[ip][1]);
+	}
+	matScale(inertia, 4.0*PI/3.0*gran->density);
+	matInv(gran->inertiaInv, inertia);
 }
 //-------------------------------------------------------------------------
 void FreeGranular(Granular *gran)

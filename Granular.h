@@ -12,16 +12,20 @@
 typedef struct
 {
 	unsigned index;
-  unsigned num; //num of particle
   float mass;
+  float density;
+
+  unsigned num; //num of particle
   Particle *component; //list of particle
   vect *offset;
+
   vect position;
   vect velocity;
   vect acceleration;
   vect angularVelocity;
-  mat3x3 inertiaInv;
   vect angularMomentum;
+
+  mat3x3 inertiaInv;
   quat quaternion;
 } Granular;
 
@@ -30,5 +34,6 @@ void InitBoxGranular(Granular *, const vect pos, float bigR, float smallR,
    float density);
 void ComputeGranularForce(Granular *iG, Granular *jG);
 void GranularTimeIntergration(Granular *, float time_step);
+void InitGranularInertia(Granular *);
 void FreeGranular(Granular *);
 #endif

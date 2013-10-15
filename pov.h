@@ -32,7 +32,7 @@ typedef struct {
 static inline void 
 cameraSave(const pov_camera *cam, FILE * fp)
 {
-  fprintf(fp, "camera {\n\tlocation <%f, %f, %f>\n\tlook_at <%f, %f, %f>\n}\n",
+  fprintf(fp, "camera {\n\tright x*image_width/image_height\n\tlocation <%f, %f, %f>\n\tlook_at <%f, %f, %f>\n}\n",
       cam->location[0], cam->location[1], cam->location[2],
       cam->lookAt[0], cam->lookAt[1], cam->lookAt[2]);
 }

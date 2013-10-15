@@ -6,13 +6,41 @@
 
 void InitDemonHT(Demon *dem_ptr)
 {
+  dem_ptr->sand_ht.content = NULL;
+  dem_ptr->sand_ht.table_size = 0;
   vect origin_point;
   setVectZero(origin_point);
   InitHashTable(&(dem_ptr->sand_ht),
 	  dem_ptr->num*2, origin_point, dem_ptr->max_radius*2);
 }
 
-void InitDemon(Demon *dem_ptr)
+//-------------------------------------------------------------------------
+void InitDemonBox(Demon *dem_ptr, const vect origin,
+    unsigned x, unsigned y, unsigned z) {
+  dem_ptr->time_step = 0.001f;
+  dem_ptr->num = x*y*z;
+  dem_ptr->sand = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
+  vect pos;
+  setVectZero(pos);
+  float boxBigR = 0.4f;
+  float boxSmallR = 0.2f;
+  float granDensity= 2.0f;
+  //dem_ptr->max_radius= boxBigR + boxSmallR*2;
+  dem_ptr->max_radius= ((boxBigR + boxSmallR)/sqrt(3.0)+boxSmallR);
+  unsigned ip = 0;
+  for(unsigned ix = 0; ix < x; ix ++)
+    for(unsigned iy = 0; iy < y; iy ++)
+      for(unsigned iz = 0; iz < z; iz ++) {
+        setVectValue(pos,
+            origin[0] + ix*dem_ptr->max_radius*2,
+            origin[1] + iy*dem_ptr->max_radius*2,
+            origin[2] + iz*dem_ptr->max_radius*2);
+        InitBoxGranular(dem_ptr->sand+(ip++), pos, boxBigR, boxSmallR, granDensity); 
+      }
+  InitDemonHT(dem_ptr);
+}
+//-------------------------------------------------------------------------
+void InitDemon2Gran(Demon *dem_ptr)
 {
   dem_ptr->time_step = 0.001f;
   dem_ptr->num = 2;
@@ -22,17 +50,19 @@ void InitDemon(Demon *dem_ptr)
   float boxBigR = 0.4f;
   float boxSmallR = 0.2f;
   float granDensity= 2.0f;
-  dem_ptr->max_radius= boxBigR + boxSmallR*2;
+  //dem_ptr->max_radius= boxBigR + boxSmallR*2;
+  dem_ptr->max_radius= ((boxBigR + boxSmallR)/sqrt(3.0)+boxSmallR);
   for(unsigned ip = 0; ip < dem_ptr->num; ip ++)
   {
     setVectValue(pos,
         1.0f,
-        (ip+1)*dem_ptr->max_radius,
+        (ip+1)*dem_ptr->max_radius*2,
         1.0f);
     InitBoxGranular(dem_ptr->sand+ip, pos, boxBigR, boxSmallR, granDensity); 
   }
   InitDemonHT(dem_ptr);
 }
+//-------------------------------------------------------------------------
 void TimeIntergration(Demon *dem_ptr)
 {
   ClearHashTable(&(dem_ptr->sand_ht));
@@ -43,7 +73,7 @@ void TimeIntergration(Demon *dem_ptr)
     InsertHashTable(&(dem_ptr->sand_ht), dem_ptr->sand+ip);
   }
 }
-
+//-------------------------------------------------------------------------
 void ComputeForce(Demon *dem_ptr)
 {
   for(unsigned ip = 0; ip < dem_ptr->num; ip ++)
@@ -90,6 +120,7 @@ void ComputeForce(Demon *dem_ptr)
     }
   }
 }
+//-------------------------------------------------------------------------
 void SaveDemon(const Demon *dem_ptr, FILE *fp)
 {
   char obj_name[] = "sand";
@@ -103,8 +134,9 @@ void SaveDemon(const Demon *dem_ptr, FILE *fp)
   }
   fprintf(fp, "}\n");
   fprintf(fp, "object {\n\t%s\n\ttranslate <%f, %f, %f>\n\trotate <%f, %f, %f>\n}\n",
-      obj_name, 0, 0, 0, 0, 0, 0);
+      obj_name, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 }
+//-------------------------------------------------------------------------
 void FreeDemon(Demon *dem_ptr) {
 	if(dem_ptr == NULL) return;
 	FreeHashTable(&(dem_ptr->sand_ht));

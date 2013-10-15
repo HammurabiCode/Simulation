@@ -17,6 +17,16 @@ matSetZero(mat3x3 m) {
 
 //-------------------------------------------------------------------------
 static inline void
+matCopy(mat3x3 dst, mat3x3 src)
+{
+	for(int i = 0; i < 3; i ++) {
+		for(int j = 0; j < 3; j ++) {
+		  dst[i][j] = src[i][j];
+    }
+	}
+}
+//-------------------------------------------------------------------------
+static inline void
 matSetIdentity(mat3x3 m)
 {
 	for(int i = 0; i < 3; i ++) {
@@ -54,6 +64,16 @@ matMulVect(vect dst, const mat3x3 a, const vect b)
 
 //-------------------------------------------------------------------------
 static inline void
+matScale(mat3x3 m, real s)
+{
+	for(int i = 0; i < 3; i ++) {
+		for(int j = 0; j < 3; j ++) {
+		  m[i][j] *= s;
+    }
+	}
+}
+//-------------------------------------------------------------------------
+static inline void
 matTranspose(mat3x3 dst, const mat3x3 src)
 {
 	for(int i = 0; i < 3; i ++) {
@@ -88,5 +108,47 @@ matFromQuat(mat3x3 dst, const quat q)
   dst[2][0] = 2*(xz - sy);
   dst[2][1] = 2*(yz + sx);
   dst[2][2] = 1 - 2*(xx + yy);
+}
+//-------------------------------------------------------------------------
+static inline int
+matInv(mat3x3 dst, const mat3x3 src)
+{
+	dst[0][0] = (src[1][1]*src[2][2]-src[1][2]*src[2][1]);
+	dst[1][0] = -(src[1][0]*src[2][2]-src[1][2]*src[2][0]);
+	dst[2][0] = (src[1][0]*src[2][1]-src[1][1]*src[2][0]);
+  //printf("[%f,\t%f,\t%f]\n", dst[0][0], dst[0][1], dst[0][2]);
+  
+	real hls = 0;
+	hls += src[0][0]*dst[0][0];
+	hls += src[0][1]*dst[1][0];
+	hls += src[0][2]*dst[2][0];
+  if(abs(hls) < ZERO) {
+    //matCopy(dst, src);
+    matSetZero(dst);
+    return 0;
+  }
+  //printf("hls = %f\n", hls);
+
+	dst[0][1] = -(src[0][1]*src[2][2]-src[0][2]*src[2][1])/hls;
+	dst[1][1] = (src[0][0]*src[2][2]-src[0][2]*src[2][0])/hls;
+	dst[2][1] = -(src[0][0]*src[2][1]-src[2][0]*src[0][1])/hls;
+
+	dst[0][2] = (src[0][1]*src[1][2]-src[1][1]*src[0][2])/hls;
+	dst[1][2] = -(src[0][0]*src[1][2]-src[0][2]*src[1][0])/hls;
+	dst[2][2] = (src[0][0]*src[1][1]-src[1][0]*src[0][1])/hls;
+
+	dst[0][0] /= hls;
+	dst[1][0] /= hls;
+	dst[2][0] /= hls;
+  return 1;
+}
+//-------------------------------------------------------------------------
+static inline void
+matPrint(const mat3x3 src)
+{
+  printf("[%f,\t%f,\t%f]\n[%f,\t%f,\t%f]\n[%f,\t%f,\t%f]\n",
+    src[0][0], src[0][1], src[0][2],
+    src[1][0], src[1][1], src[1][2],
+    src[2][0], src[2][1], src[2][2]);
 }
 #endif
