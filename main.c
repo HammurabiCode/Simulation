@@ -21,6 +21,8 @@ const static unsigned PART_NUM = 2;
 
 int main(int argc, char *argv[])
 {
+	char strFileName[192] = "";
+	
   /*
   mat3x3 matOne, matOneInv, matMul;
   matOne[0][0] = 1; matOne[0][1] = 2; matOne[0][2] = 3;
@@ -34,7 +36,9 @@ int main(int argc, char *argv[])
 	//InitDemon2Gran(&d1);
   vect or;
   setVectValue(or, 1.0, 1.0, 1.0);
-	InitDemonBox(&d1, or, 4, 4, 4);
+
+	//InitDemonBox(&d1, or, 4, 4, 4);
+	InitDemonGroGra(&d1);
 
 	pov pov1;
   pov1.num_light = 0;
@@ -47,8 +51,16 @@ int main(int argc, char *argv[])
 	povAddLight(&pov1, &light1);
 	povAddInclude(&pov1, "colors");
 	pov1.dem_scene = &d1;
-	povSave(&pov1, "1.pov");
+	for (unsigned iFrame = 0; iFrame < 2; iFrame ++) {
+		if (iFrame % 10 == 0) {
+			sprintf(strFileName, "pov_out/demon-1/pov/GroundGranular%02u.pov", iFrame%10);
+		}
+		povSave(&pov1, strFileName);
+		ComputeForce(&d1);
+		TimeIntergration(&d1);
+	}
 
   FreeDemon(&d1);
+	povFree(&pov1);
   return 0;
 }

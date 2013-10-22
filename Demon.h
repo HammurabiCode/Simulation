@@ -5,16 +5,19 @@
 
 typedef struct
 {
-  Granular *sand;
-  unsigned num;
-  HashTable sand_ht;
-  float max_radius;
   float time_step;
+  unsigned num;
+  Granular *sand;
+  float max_radius;
+  HashTable sand_ht;
 } Demon;
 
 void InitDemonHT(Demon*);
+
 void InitDemon2Gran(Demon*);
 void InitDemonBox(Demon*, const vect, unsigned, unsigned, unsigned);
+void InitDemonGroGra(Demon *dem_ptr);
+
 void ComputeForce(Demon*);
 void TimeIntergration(Demon *);
 void SaveDemon(const Demon * , FILE *);

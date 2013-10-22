@@ -109,5 +109,6 @@ static inline void print_vect(const vect v, const char *str)
 {
   printf("%s: x=%f, y=%f, z=%f.", str, v[0], v[1], v[2]);
 }
+const static vect GRAVITY = {0, 0, -9.8};
 //-------------------------------------------------------------------------
 #endif

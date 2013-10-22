@@ -35,8 +35,35 @@ void InitDemonBox(Demon *dem_ptr, const vect origin,
             origin[0] + ix*dem_ptr->max_radius*2,
             origin[1] + iy*dem_ptr->max_radius*2,
             origin[2] + iz*dem_ptr->max_radius*2);
-        InitBoxGranular(dem_ptr->sand+(ip++), pos, boxBigR, boxSmallR, granDensity); 
+        InitBoxGranular(ip, dem_ptr->sand+ip, pos, boxBigR, boxSmallR, granDensity); 
+				ip ++;
       }
+  InitDemonHT(dem_ptr);
+}
+//-------------------------------------------------------------------------
+void InitDemonGroGra(Demon *dem_ptr)
+{
+  dem_ptr->time_step = 0.001f;
+  dem_ptr->num = 2;
+  dem_ptr->sand = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
+  //--------------------------------
+  vect pos;
+  setVectZero(pos);
+  float boxBigR = 0.4f;
+  float boxSmallR = 0.2f;
+  float granDensity= 2.0f;
+  dem_ptr->max_radius= ((boxBigR + boxSmallR)/sqrt(3.0)+boxSmallR);
+  //--------------------------------
+  unsigned ip = 0;
+  //--------------------------------
+	setVectValue(pos,	boxSmallR*2, boxSmallR*2,	2.0f);
+	//InitBoxGranular(ip, dem_ptr->sand+ip, pos, boxBigR, boxSmallR, granDensity); 
+	InitGranularSphere(ip, dem_ptr->sand+ip, pos, boxSmallR, granDensity); 
+	ip++;
+  //--------------------------------
+	setVectValue(pos, 0, 0, 0);
+	InitGranularHPlane(ip, dem_ptr->sand+ip, pos, 5, 5, boxSmallR, granDensity);
+  //--------------------------------
   InitDemonHT(dem_ptr);
 }
 //-------------------------------------------------------------------------
@@ -58,7 +85,7 @@ void InitDemon2Gran(Demon *dem_ptr)
         1.0f,
         (ip+1)*dem_ptr->max_radius*2,
         1.0f);
-    InitBoxGranular(dem_ptr->sand+ip, pos, boxBigR, boxSmallR, granDensity); 
+    InitBoxGranular(ip, dem_ptr->sand+ip, pos, boxBigR, boxSmallR, granDensity); 
   }
   InitDemonHT(dem_ptr);
 }
@@ -76,6 +103,10 @@ void TimeIntergration(Demon *dem_ptr)
 //-------------------------------------------------------------------------
 void ComputeForce(Demon *dem_ptr)
 {
+	ComputeGranularForce(dem_ptr->sand + 0, dem_ptr->sand + 1);
+	return;
+	/*
+	*/
   for(unsigned ip = 0; ip < dem_ptr->num; ip ++)
   {
     Granular *cur_g = dem_ptr->sand + ip;
@@ -129,7 +160,7 @@ void SaveDemon(const Demon *dem_ptr, FILE *fp)
     for(unsigned j = 0; j < dem_ptr->sand[i].num; j++) {
       const Particle *p = &(dem_ptr->sand[i].component[j]);
       fprintf(fp, "sphere {\n\t<%f, %f, %f>, %f\n\ttexture {pigment{color Brown}}\n}\n",
-          p->position[0], p->position[1], p->position[2], p->radius);
+          p->position[0], p->position[2], p->position[1], p->radius);
     }
   }
   fprintf(fp, "}\n");

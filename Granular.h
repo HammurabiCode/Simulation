@@ -30,8 +30,12 @@ typedef struct
 } Granular;
 
 //-------------------------------------
-void InitBoxGranular(Granular *, const vect pos, float bigR, float smallR,
-   float density);
+void InitBoxGranular(unsigned index, Granular *gran, const vect pos,
+		float bigR, float smallR, float density);
+void InitGranularHPlane(unsigned index, Granular *gran, const vect min_pos,
+		unsigned l, unsigned w, float radius, float density);
+void InitGranularSphere(unsigned index, Granular *gran, const vect pos,
+    float radius, float density);
 void ComputeGranularForce(Granular *iG, Granular *jG);
 void GranularTimeIntergration(Granular *, float time_step);
 void InitGranularInertia(Granular *);

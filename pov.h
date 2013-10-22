@@ -112,5 +112,17 @@ void povSave(const pov *p, const char *filename)
 */
   fclose(fp);
 }
+static
+void povFree(pov *p) {
+	if (p->num_light != 0) {
+		free(p->lights);
+	}
+	if (p->num_include != 0) {
+		for (unsigned i = 0; i< p->num_include; i++) {
+			free(p->include[i]);
+		}
+		free(p->include);
+	}
+}
 //-------------------------------------------------------------------------
 #endif
