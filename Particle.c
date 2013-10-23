@@ -6,12 +6,12 @@ void InitParticleA(Particle *par_list, unsigned num)
 {
 }
 
-void InitParticle(Particle *p, const vect *pos, float r)
+void InitParticle(Particle *p, const vect pos, float r)
 {
 	p->radius = r;
-	copyVect((p->position), pos);
-	setVectZero((p->velocity));
-	setVectZero((p->force));
+	copyVect(p->position, pos);
+	setVectZero(p->velocity);
+	setVectZero(p->force);
 	return;
 }
 void ComputeParticleForce(Particle *ip, Particle *jp)

@@ -107,9 +107,11 @@ void InitGranularHPlane(unsigned index, Granular *gran, const vect min_pos,
 		}
 	}
   //--------------------------------
+  /*
 	setQuatZero(&(gran->quaternion));
 	gran->quaternion[0] = 1.0f;
 	InitGranularInertia(gran);
+  */
 }
 //-------------------------------------------------------------------------
 void ComputeGranularForce(Granular *iG, Granular *jG)
@@ -117,17 +119,27 @@ void ComputeGranularForce(Granular *iG, Granular *jG)
   unsigned i = 0;
   char name[4];
 	for(unsigned ip = 0; ip < iG->num; ip++) {
+    /*
+    sprintf(name, "%02u", i++);
+    print_vect(iG->component[ip].force, name); 
+    printf("\n");
+    */
 		for(unsigned jp = 0; jp < jG->num; jp ++) {
-      sprintf(name, "%02u", i++);
-      print_vect(iG->component[ip].force, name); 
 			ComputeParticleForce(iG->component + ip, jG->component + jp);
-      printf("\n");
 		}
 	}
 }
 void GranularTimeIntergration(Granular *iG, float time_step)
 {
-	if(iG->mass <= 0.0f) return;
+	if (iG->mass <= 0.0f) return;
+  if (iG->num == 1) {
+    scaleAddVect(iG->acceleration, iG->component[0].force, 1.0/iG->mass);
+    addVect(iG->acceleration, GRAVITY);
+    scaleAddVect(iG->velocity, iG->acceleration, time_step);
+    copyVect(iG->component[0].velocity, iG->velocity);
+    UpdateParticlePosition(iG->component+0, time_step);
+    return;
+  }
   vect dAngMom;
   setVectZero(dAngMom);
   vect sumForce;
@@ -185,6 +197,7 @@ void InitGranularInertia(Granular *gran) {
 				+ gran->offset[ip][1]*gran->offset[ip][1]);
 	}
 	matScale(inertia, 4.0*PI/3.0*gran->density);
+	matSetZero(gran->inertiaInv);
 	matInv(gran->inertiaInv, inertia);
 }
 //-------------------------------------------------------------------------

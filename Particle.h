@@ -16,7 +16,7 @@ typedef struct{
 } Particle;
 
 void InitParticleA(Particle *p_list, unsigned num);
-void InitParticle(Particle *, const vect *, float);
+void InitParticle(Particle *, const vect, float);
 void ComputeParticleForce(Particle *, Particle *);
 static inline
 void UpdateParticlePosition(Particle *ip, float ts)

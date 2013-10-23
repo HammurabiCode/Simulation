@@ -51,11 +51,12 @@ int main(int argc, char *argv[])
 	povAddLight(&pov1, &light1);
 	povAddInclude(&pov1, "colors");
 	pov1.dem_scene = &d1;
-	for (unsigned iFrame = 0; iFrame < 2; iFrame ++) {
+	for (unsigned iFrame = 0; iFrame < 300; iFrame ++) {
 		if (iFrame % 10 == 0) {
-			sprintf(strFileName, "pov_out/demon-1/pov/GroundGranular%02u.pov", iFrame%10);
+			sprintf(strFileName, "pov_out/demon-1/pov/GroundGranular%02u.pov", iFrame/10);
+      //print_vect(d1.sand->component[0].position, "");
+      povSave(&pov1, strFileName);
 		}
-		povSave(&pov1, strFileName);
 		ComputeForce(&d1);
 		TimeIntergration(&d1);
 	}
