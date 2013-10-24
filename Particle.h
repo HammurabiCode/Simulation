@@ -21,7 +21,7 @@ void ComputeParticleForce(Particle *, Particle *);
 static inline
 void UpdateParticlePosition(Particle *ip, float ts)
 {
-  scaleAddVect(ip->position, ip->velocity, ts);
+  vectScaleAdd(ip->position, ip->velocity, ts);
 }
 
 #endif

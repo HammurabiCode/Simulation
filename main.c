@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 	Demon d1;
 	//InitDemon2Gran(&d1);
   vect or;
-  setVectValue(or, 1.0, 1.0, 1.0);
+  vectSetValue(or, 1.0, 1.0, 1.0);
 
 	//InitDemonBox(&d1, or, 4, 4, 4);
 	InitDemonGroGra(&d1);
@@ -43,10 +43,10 @@ int main(int argc, char *argv[])
 	pov pov1;
   pov1.num_light = 0;
   pov1.num_include= 0;
-	setVectValue(&(pov1.camera.location), 10, 10, 10);
-	setVectValue(&(pov1.camera.lookAt), 0, 0, 0);
+	vectSetValue(&(pov1.camera.location), 10, 10, 10);
+	vectSetValue(&(pov1.camera.lookAt), 0, 0, 0);
 	pov_light light1;
-	setVectValue(&(light1.location), 10, 10, 10);
+	vectSetValue(&(light1.location), 10, 10, 10);
 	lightSetColor(&light1, "White");
 	povAddLight(&pov1, &light1);
 	povAddInclude(&pov1, "colors");

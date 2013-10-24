@@ -46,7 +46,7 @@ void InitHashTable(HashTable *ht, unsigned ts, const vect min_p, float cl)
 {
   ht->table_size = ts;
   ht->cell_length = cl;
-  copyVect((ht->min_pos), min_p);
+  vectCopy((ht->min_pos), min_p);
   if(ht->content != NULL)
   {
     free(ht->content);

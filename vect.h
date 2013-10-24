@@ -10,98 +10,98 @@
 typedef float real;
 typedef float vect[3];
 //-------------------------------------------------------------------------
-static inline void setVectZero(vect v)
+static inline void vectSetZero(vect v)
 {
   for(int i = 0; i < 3; i ++)
     v[i] = 0;
 }
 //-------------------------------------------------------------------------
-static inline void setVectValue(vect v, float x, float y, float z)
+static inline void vectSetValue(vect v, float x, float y, float z)
 {
   v[0] = x; v[1] = y; v[2] = z;
 }
 //-------------------------------------------------------------------------
-static inline void copyVect(vect dst, const vect src)
+static inline void vectCopy(vect dst, const vect src)
 {
   for(int i = 0; i < 3; i ++)
     dst[i] = src[i];
 }
 //-------------------------------------------------------------------------
-static inline float getVectLength(const vect v)
+static inline float vectGetLength(const vect v)
 {
   return sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
 //-------------------------------------------------------------------------
-static inline void addCrossProductVect(vect c, const vect a, const vect b)
+static inline void vectAddCrossProduct(vect c, const vect a, const vect b)
 {
   c[0] += a[1]*b[2] - a[2]*b[1];
   c[1] += -(a[0]*b[2] - a[2]*b[0]);
   c[2] += a[0]*b[1] - a[1]*b[0];
 }
 //-------------------------------------------------------------------------
-static inline void crossProductVect(vect c, const vect a, const vect b)
+static inline void vectCrossProduct(vect c, const vect a, const vect b)
 {
   c[0] = a[1]*b[2] - a[2]*b[1];
   c[1] = -(a[0]*b[2] - a[2]*b[0]);
   c[2] = a[0]*b[1] - a[1]*b[0];
 }
 //-------------------------------------------------------------------------
-static inline float dotProductVect(const vect a, const vect b)
+static inline float vectDotProduct(const vect a, const vect b)
 {
   return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
 }
 //-------------------------------------------------------------------------
-static inline void scaleAddVect(vect v, const vect v0, float s)
+static inline void vectScaleAdd(vect v, const vect v0, float s)
 {
   for(int i = 0; i < 3; i ++)
     v[i] += v0[i]*s;
 }
 //-------------------------------------------------------------------------
-static inline void addVectTo(vect v, const vect v1, const vect v2)
+static inline void vectAddTo(vect v, const vect v1, const vect v2)
 {
   for(int i = 0; i < 3; i ++)
     v[i] = v1[i] + v2[i];
 }
-static inline void addVect(vect v, const vect v0)
+static inline void vectAdd(vect v, const vect v0)
 {
-  addVectTo(v, v, v0);
+  vectAddTo(v, v, v0);
 }
 //-------------------------------------------------------------------------
-static inline void substractVectTo(vect v, const vect v1, const vect v2)
+static inline void vectSubstractTo(vect v, const vect v1, const vect v2)
 {
   for(int i = 0; i < 3; i ++)
     v[i] = v1[i] - v2[i];
 }
 //-------------------------------------------------------------------------
-static inline void substractVect(vect v, const vect v0)
+static inline void vectSubstract(vect v, const vect v0)
 {
-  substractVectTo(v, v, v0);
+  vectSubstractTo(v, v, v0);
 }
 //-------------------------------------------------------------------------
-static inline void scaleVectTo(vect v, const vect v0, float s)
+static inline void vectScaleTo(vect v, const vect v0, float s)
 {
   for(int i = 0; i < 3; i ++)
     v[i] = v0[i]*s;
 }
 //-------------------------------------------------------------------------
-static inline void scaleVect(vect v, float s)
+static inline void vectScale(vect v, float s)
 {
-  scaleVectTo(v, v, s);
+  vectScaleTo(v, v, s);
 }
 //-------------------------------------------------------------------------
-static inline float getVectDistance(const vect v1, const vect v2)
+static inline float vectGetDistance(const vect v1, const vect v2)
 { 
   vect t;
-  substractVectTo(t, v1, v2);
-  return getVectLength(t);
+  vectSubstractTo(t, v1, v2);
+  return vectGetLength(t);
 }
 //-------------------------------------------------------------------------
-static inline float normalizeVect(vect a)
+static inline float vectNormalize(vect a)
 {
-  float len = getVectLength(a);
+  float len = vectGetLength(a);
   if(len < ZERO)
     return 0.0f;
-  scaleVect(a, 1.0f/len);
+  vectScale(a, 1.0f/len);
   return len;
 }
 //-------------------------------------------------------------------------
