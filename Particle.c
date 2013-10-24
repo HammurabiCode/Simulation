@@ -14,8 +14,7 @@ void InitParticle(Particle *p, const vect pos, float r)
 	vectSetZero(p->force);
 	return;
 }
-void ComputeParticleForce(Particle *ip, Particle *jp)
-{
+void ComputeParticleForce(Particle *ip, Particle *jp) {
 	vect vPosNorm;
 	vectSubstractTo(vPosNorm, jp->position, ip->position);
 	float sKesi = ip->radius + jp->radius - vectNormalize(vPosNorm);

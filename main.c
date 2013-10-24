@@ -38,22 +38,38 @@ int main(int argc, char *argv[])
   vectSetValue(or, 1.0, 1.0, 1.0);
 
 	//InitDemonBox(&d1, or, 4, 4, 4);
-	InitDemonGroGra(&d1);
+	//InitDemonGroGra(&d1);
+	InitDemonHorizon(&d1);
 
 	pov pov1;
   pov1.num_light = 0;
   pov1.num_include= 0;
+	//vectSetValue(&(pov1.camera.location), 10, 10, 10);
+	//vectSetValue(&(pov1.camera.lookAt), 0, 0, 0);
 	vectSetValue(&(pov1.camera.location), 10, 10, 10);
-	vectSetValue(&(pov1.camera.lookAt), 0, 0, 0);
+	vectSetValue(&(pov1.camera.lookAt), 10, 0, 0);
+
 	pov_light light1;
+	vectSetValue(&(light1.location), 10, -10, 10);
+	lightSetColor(&light1, "White");
+	povAddLight(&pov1, &light1);
+	vectSetValue(&(light1.location), -10, 10, 10);
+	lightSetColor(&light1, "White");
+	povAddLight(&pov1, &light1);
+	vectSetValue(&(light1.location), -10, -10, 10);
+	lightSetColor(&light1, "White");
+	povAddLight(&pov1, &light1);
+
 	vectSetValue(&(light1.location), 10, 10, 10);
 	lightSetColor(&light1, "White");
 	povAddLight(&pov1, &light1);
 	povAddInclude(&pov1, "colors");
 	pov1.dem_scene = &d1;
-	for (unsigned iFrame = 0; iFrame < 300; iFrame ++) {
-		if (iFrame % 10 == 0) {
-			sprintf(strFileName, "pov_out/demon-1/pov/GroundGranular%02u.pov", iFrame/10);
+  unsigned output_rate = (unsigned)(1.0/60.0/d1.time_step);
+	for (unsigned iFrame = 0; iFrame < 180; iFrame ++) {
+		if (iFrame % output_rate == 0) {
+			sprintf(strFileName, "/home/hammurabi/toShare/demon-1/pov/GroundGranular%03u.pov", iFrame/output_rate);
+      printf("%f\t%f\t%f\n", d1.sand[0].component[0].position[0], d1.sand[0].component[0].position[1], d1.sand[0].component[0].position[2]);
       //print_vect(d1.sand->component[0].position, "");
       povSave(&pov1, strFileName);
 		}

@@ -33,15 +33,15 @@ static inline void
 cameraSave(const pov_camera *cam, FILE * fp)
 {
   fprintf(fp, "camera {\n\tright x*image_width/image_height\n\tlocation <%f, %f, %f>\n\tlook_at <%f, %f, %f>\n}\n",
-      cam->location[0], cam->location[1], cam->location[2],
-      cam->lookAt[0], cam->lookAt[1], cam->lookAt[2]);
+      cam->location[0], cam->location[2], cam->location[1],
+      cam->lookAt[0], cam->lookAt[2], cam->lookAt[1]);
 }
 //-------------------------------------------------------------------------
 static inline void 
 lightSave(const pov_light *l, FILE * fp)
 {
   fprintf(fp, "light_source {\n\t<%f, %f, %f>\n\tcolor %s\n}\n",
-      l->location[0], l->location[1], l->location[2],
+      l->location[0], l->location[2], l->location[1],
       l->color);
 }
 static inline void 

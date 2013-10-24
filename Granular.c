@@ -95,16 +95,12 @@ void InitGranularHPlane(unsigned index, Granular *gran, const vect min_pos,
 	gran->num = l*w;
 	gran->component = (Particle*) malloc(sizeof(Particle)*gran->num);
 	gran->offset = (vect*) malloc(sizeof(vect)*gran->num);
-	float d = radius*2;
-	unsigned ip = 0;
-  for (unsigned x = 0; x < l; x++) {
-		for (unsigned y = 0; y < w; y++) {
-			vectSetValue(gran->offset+ip, x*d, y*d, 0);
-			vect pos;
-			vectAddTo(pos, min_pos, gran->offset+ip);
-			InitParticle(gran->component+ip, pos, radius);
-			ip ++;
-		}
+	float d = radius*2*0.618;
+  for (unsigned ip = 0; ip < gran->num; ip++) {
+    vectSetValue(gran->offset+ip, (ip%l)*d, (ip/l)*d, 0);
+    vect pos;
+    vectAddTo(pos, min_pos, gran->offset+ip);
+    InitParticle(gran->component+ip, pos, radius);
 	}
   //--------------------------------
   /*
@@ -133,11 +129,14 @@ void GranularTimeIntergration(Granular *iG, float time_step)
 {
 	if (iG->mass <= 0.0f) return;
   if (iG->num == 1) {
-    vectScaleAdd(iG->acceleration, iG->component[0].force, 1.0/iG->mass);
+    vectScaleTo(iG->acceleration, iG->component[0].force, 1.0/iG->mass);
     vectAdd(iG->acceleration, GRAVITY);
     vectScaleAdd(iG->velocity, iG->acceleration, time_step);
+    vectScaleAdd(iG->position, iG->velocity, time_step);
     vectCopy(iG->component[0].velocity, iG->velocity);
     UpdateParticlePosition(iG->component+0, time_step);
+    vectSetZero(iG->acceleration);
+    vectSetZero(iG->component[0].force);
     return;
   }
   vect dAngMom;
@@ -164,7 +163,7 @@ void GranularTimeIntergration(Granular *iG, float time_step)
   matMulMat(iG->inertiaInv, matTemp, matRotTran);
   matMulVect(iG->angularVelocity, iG->inertiaInv, iG->angularMomentum);
   //print_vect(sumForce, "");
-	vectScaleAdd(iG->acceleration, sumForce, 1.0/iG->mass);
+	vectScaleTo(iG->acceleration, sumForce, 1.0/iG->mass);
 	vectAdd(iG->acceleration, GRAVITY);
 	vectScaleAdd(iG->velocity, iG->acceleration, time_step);
   for(unsigned ip = 0; ip < iG->num; ip++) {

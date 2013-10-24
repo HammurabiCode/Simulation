@@ -6,8 +6,8 @@ typedef struct{
   vect position;
   vect velocity;
   vect force;
+  //ParticleIndex index;
 	/*
-  ParticleIndex index;
   float mass;
   float density;
   float young;

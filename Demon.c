@@ -41,6 +41,34 @@ void InitDemonBox(Demon *dem_ptr, const vect origin,
   InitDemonHT(dem_ptr);
 }
 //-------------------------------------------------------------------------
+void InitDemonHorizon(Demon *dem_ptr)
+{
+  dem_ptr->time_step = 0.001f;
+  dem_ptr->num = 2;
+  dem_ptr->sand = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
+  //--------------------------------
+  vect pos;
+  vectSetZero(pos);
+  float boxBigR = 0.4f;
+  float boxSmallR = 0.2f;
+  float granDensity= 2.0f;
+  dem_ptr->max_radius= ((boxBigR + boxSmallR)/sqrt(3.0)+boxSmallR);
+  //--------------------------------
+  unsigned ip = 0;
+  //--------------------------------
+	vectSetValue(pos,	0, boxSmallR*2*2, boxSmallR*2);
+	//vectSetValue(pos,	0, 0,	2.0f);
+	//InitBoxGranular(ip, dem_ptr->sand+ip, pos, boxBigR, boxSmallR, granDensity); 
+	InitGranularSphere(ip, dem_ptr->sand+ip, pos, boxSmallR, granDensity); 
+	vectSetValue(dem_ptr->sand[ip].velocity, 4, 0, 0);
+	ip++;
+  //--------------------------------
+	vectSetValue(pos, 0, 0, 0);
+	InitGranularHPlane(ip, dem_ptr->sand+ip, pos, 100, 5, boxSmallR, granDensity);
+  //--------------------------------
+  InitDemonHT(dem_ptr);
+}
+//-------------------------------------------------------------------------
 void InitDemonGroGra(Demon *dem_ptr)
 {
   dem_ptr->time_step = 0.001f;
@@ -57,6 +85,7 @@ void InitDemonGroGra(Demon *dem_ptr)
   unsigned ip = 0;
   //--------------------------------
 	vectSetValue(pos,	boxSmallR*2, boxSmallR*2,	2.0f);
+	//vectSetValue(pos,	0, 0,	2.0f);
 	//InitBoxGranular(ip, dem_ptr->sand+ip, pos, boxBigR, boxSmallR, granDensity); 
 	InitGranularSphere(ip, dem_ptr->sand+ip, pos, boxSmallR, granDensity); 
 	ip++;
@@ -103,7 +132,11 @@ void TimeIntergration(Demon *dem_ptr)
 //-------------------------------------------------------------------------
 void ComputeForce(Demon *dem_ptr)
 {
-	ComputeGranularForce(dem_ptr->sand + 0, dem_ptr->sand + 1);
+  for(unsigned ig = 0; ig < dem_ptr->num; ig++) {
+    for(unsigned jg = ig+1; jg < dem_ptr->num; jg++) {
+      ComputeGranularForce(dem_ptr->sand + ig, dem_ptr->sand + jg);
+    }
+  }
 	return;
 	/*
 	*/
