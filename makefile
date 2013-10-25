@@ -50,4 +50,5 @@ pov.o : pov.c pov.h vect.h
 	gcc -o pov.o -c pov.c -lm -std=$(C_STD) -g
 
 clean : 
-	rm $(OBJ) $(EXECUTABLE) *~ .*.swp
+	- rm $(OBJ) $(EXECUTABLE) *~ .*.swp
+	- rm pov_out/demon*/pov/*

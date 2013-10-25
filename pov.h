@@ -94,9 +94,12 @@ povAddLight(pov *p, const pov_light* lig)
 }
 //-------------------------------------------------------------------------
 static
-void povSave(const pov *p, const char *filename)
+int povSave(const pov *p, const char *filename)
 {
   FILE *fp = fopen(filename, "wt");
+  if(fp == NULL) {
+    return 0;
+  }
   for(unsigned i = 0; i < p->num_include; i++) {
     includeSave(p->include[i], fp);
   }
@@ -111,6 +114,7 @@ void povSave(const pov *p, const char *filename)
 /*
 */
   fclose(fp);
+  return 1;
 }
 static
 void povFree(pov *p) {

@@ -15,23 +15,25 @@ float GetKr(const Particle *p1, const Particle *p2)
   return 0.75f/ result;
 }
 */
-
+typedef void (*InitDemonFunc)(Demon *);
+enum {
+  INIT_PUSH_SHPERE,
+  INIT_FALL_SHPERE,
+  INIT_THROW_SHPERE,
+  INIT_FUNC_NUM
+};
+char filenameList[INIT_FUNC_NUM][128] = {
+  "demon-push",
+  "demon-fall",
+  "demon-throw",
+};
 
 const static unsigned PART_NUM = 2;
 
 int main(int argc, char *argv[])
 {
-	char strFileName[192] = "";
+	char strFileName[512] = "";
 	
-  /*
-  mat3x3 matOne, matOneInv, matMul;
-  matOne[0][0] = 1; matOne[0][1] = 2; matOne[0][2] = 3;
-  matOne[1][0] = 2; matOne[1][1] = 2; matOne[1][2] = 1;
-  matOne[2][0] = 3; matOne[2][1] = 4; matOne[2][2] = 3;
-  matInv(matOneInv, matOne);
-  matMulMat(matMul, matOne, matOneInv);
-  matPrint(matMul);
-  */
 	Demon d1;
 	//InitDemon2Gran(&d1);
   vect or;
@@ -39,14 +41,19 @@ int main(int argc, char *argv[])
 
 	//InitDemonBox(&d1, or, 4, 4, 4);
 	//InitDemonGroGra(&d1);
-	InitDemonHorizon(&d1);
+  const InitDemonFunc initList[INIT_FUNC_NUM] = {
+    InitDemonPush,
+    InitDemonFall,
+    InitDemonThrow
+  };
+      
 
 	pov pov1;
   pov1.num_light = 0;
   pov1.num_include= 0;
 	//vectSetValue(&(pov1.camera.location), 10, 10, 10);
 	//vectSetValue(&(pov1.camera.lookAt), 0, 0, 0);
-	vectSetValue(&(pov1.camera.location), 10, 10, 10);
+	vectSetValue(&(pov1.camera.location), 10, 15, 5);
 	vectSetValue(&(pov1.camera.lookAt), 10, 0, 0);
 
 	pov_light light1;
@@ -64,20 +71,34 @@ int main(int argc, char *argv[])
 	lightSetColor(&light1, "White");
 	povAddLight(&pov1, &light1);
 	povAddInclude(&pov1, "colors");
-	pov1.dem_scene = &d1;
-  unsigned output_rate = (unsigned)(1.0/60.0/d1.time_step);
-	for (unsigned iFrame = 0; iFrame < 180; iFrame ++) {
-		if (iFrame % output_rate == 0) {
-			sprintf(strFileName, "/home/hammurabi/toShare/demon-1/pov/GroundGranular%03u.pov", iFrame/output_rate);
-      printf("%f\t%f\t%f\n", d1.sand[0].component[0].position[0], d1.sand[0].component[0].position[1], d1.sand[0].component[0].position[2]);
-      //print_vect(d1.sand->component[0].position, "");
-      povSave(&pov1, strFileName);
-		}
-		ComputeForce(&d1);
-		TimeIntergration(&d1);
-	}
 
-  FreeDemon(&d1);
+  for(unsigned iCurDemon = 0; iCurDemon < INIT_FUNC_NUM; iCurDemon ++) {
+    (initList[iCurDemon])(&d1);
+
+    pov1.dem_scene = &d1;
+    unsigned output_rate = (unsigned)(1.0/60.0/d1.time_step);
+    char cmd[256];
+    sprintf(cmd, "mkdir pov_out/%s", filenameList[iCurDemon]);
+    system(cmd);
+    sprintf(cmd, "mkdir pov_out/%s/pov", filenameList[iCurDemon]);
+    system(cmd);
+    for (unsigned iFrame = 0; iFrame < 4800; iFrame ++) {
+      if (iFrame % output_rate == 0) {
+        //sprintf(strFileName, "/home/hammurabi/toShare/demon-1/pov/GroundGranular%03u.pov", iFrame/output_rate);
+        sprintf(strFileName, "out/%s/pov/%03u.pov", filenameList[iCurDemon], iFrame/output_rate);
+        //printf("%f\t%f\t%f\n", d1.sand[0].component[0].position[0], d1.sand[0].component[0].position[1], d1.sand[0].component[0].position[2]);
+        //print_vect(d1.sand->component[0].position, "");
+        if( 0 == povSave(&pov1, strFileName)) {
+          printf("Can't open file: %s\n", strFileName);
+          return;
+        }
+      }
+      ComputeForce(&d1);
+      TimeIntergration(&d1);
+    }
+
+    FreeDemon(&d1);
+  }
 	povFree(&pov1);
   return 0;
 }
