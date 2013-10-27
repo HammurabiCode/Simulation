@@ -20,6 +20,7 @@ void InitDemonBox(Demon*, const vect, unsigned, unsigned, unsigned);
 void InitDemonPush(Demon *dem_ptr);
 void InitDemonThrow(Demon *dem_ptr);
 void InitDemonFall(Demon *dem_ptr);
+void InitDemonGranPull(Demon *dem_ptr);
 
 void ComputeForce(Demon*);
 void TimeIntergration(Demon *);

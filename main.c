@@ -20,19 +20,21 @@ enum {
   INIT_PUSH_SHPERE,
   INIT_FALL_SHPERE,
   INIT_THROW_SHPERE,
+  INIT_GRAN_PULL,
   INIT_FUNC_NUM
 };
 char filenameList[INIT_FUNC_NUM][128] = {
   "demon-push",
   "demon-fall",
   "demon-throw",
+  "gran-pull",
 };
 
 const static unsigned PART_NUM = 2;
 
 int main(int argc, char *argv[])
 {
-	char strFileName[512] = "";
+	char *strFileName = (char*) malloc(sizeof(char)*1024);
 	
 	Demon d1;
 	//InitDemon2Gran(&d1);
@@ -44,7 +46,8 @@ int main(int argc, char *argv[])
   const InitDemonFunc initList[INIT_FUNC_NUM] = {
     InitDemonPush,
     InitDemonFall,
-    InitDemonThrow
+    InitDemonThrow,
+    InitDemonGranPull
   };
       
 
@@ -72,17 +75,19 @@ int main(int argc, char *argv[])
 	povAddLight(&pov1, &light1);
 	povAddInclude(&pov1, "colors");
 
-  for(unsigned iCurDemon = 0; iCurDemon < INIT_FUNC_NUM; iCurDemon ++) {
+  unsigned iCurDemon = INIT_GRAN_PULL; 
+  //for(iCurDemon = 0; iCurDemon < INIT_FUNC_NUM; iCurDemon ++) 
+  {
     (initList[iCurDemon])(&d1);
 
     pov1.dem_scene = &d1;
     unsigned output_rate = (unsigned)(1.0/60.0/d1.time_step);
     char cmd[256];
-    sprintf(cmd, "mkdir pov_out/%s", filenameList[iCurDemon]);
+    sprintf(cmd, "mkdir out/%s", filenameList[iCurDemon]);
     system(cmd);
-    sprintf(cmd, "mkdir pov_out/%s/pov", filenameList[iCurDemon]);
+    sprintf(cmd, "mkdir out/%s/pov", filenameList[iCurDemon]);
     system(cmd);
-    for (unsigned iFrame = 0; iFrame < 4800; iFrame ++) {
+    for (unsigned iFrame = 0; iFrame < 100; iFrame ++) {
       if (iFrame % output_rate == 0) {
         //sprintf(strFileName, "/home/hammurabi/toShare/demon-1/pov/GroundGranular%03u.pov", iFrame/output_rate);
         sprintf(strFileName, "out/%s/pov/%03u.pov", filenameList[iCurDemon], iFrame/output_rate);
@@ -90,15 +95,15 @@ int main(int argc, char *argv[])
         //print_vect(d1.sand->component[0].position, "");
         if( 0 == povSave(&pov1, strFileName)) {
           printf("Can't open file: %s\n", strFileName);
-          return;
+          return -1;
         }
       }
       ComputeForce(&d1);
       TimeIntergration(&d1);
     }
-
     FreeDemon(&d1);
   }
+  free(strFileName);
 	povFree(&pov1);
   return 0;
 }

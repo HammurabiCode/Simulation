@@ -41,6 +41,32 @@ void InitDemonBox(Demon *dem_ptr, const vect origin,
   InitDemonHT(dem_ptr);
 }
 //-------------------------------------------------------------------------
+void InitDemonGranPull(Demon *dem_ptr) {
+  dem_ptr->time_step = 0.001f;
+  dem_ptr->num = 1;
+  dem_ptr->sand = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
+  
+  vect pos;
+  vectSetZero(pos);
+  float boxBigR = 0.4f;
+  float boxSmallR = 0.2f;
+  float granDensity= 2.0f;
+  float granEdge = ((boxBigR + boxSmallR)/sqrt(3.0)+boxSmallR);
+  unsigned ip = 0;
+  //--------------------------------
+	vectSetValue(pos,	boxSmallR*2*10, boxSmallR*2*2, granEdge+boxSmallR*10);
+	InitBoxGranular(ip, dem_ptr->sand+ip, pos, boxBigR, boxSmallR, granDensity); 
+	vectSetValue(dem_ptr->sand[ip].velocity, 6.18, 0, 0);
+	ip++;
+  //--------------------------------
+  unsigned xSize = 100;
+  unsigned ySize = 20;
+	vectSetValue(pos, 0, -ySize*boxSmallR, 0);
+	InitGranularHPlane(ip, dem_ptr->sand+ip, pos, xSize, ySize, boxSmallR, granDensity);
+  //--------------------------------
+  //InitDemonHT(dem_ptr);
+}
+//-------------------------------------------------------------------------
 void InitDemonPush(Demon *dem_ptr) {
   dem_ptr->time_step = 0.001f;
   dem_ptr->num = 2;
@@ -62,8 +88,10 @@ void InitDemonPush(Demon *dem_ptr) {
 	vectSetValue(dem_ptr->sand[ip].velocity, 6.18, 0, 0);
 	ip++;
   //--------------------------------
-	vectSetValue(pos, 0, 0, 0);
-	InitGranularHPlane(ip, dem_ptr->sand+ip, pos, 100, 5, boxSmallR, granDensity);
+  unsigned xSize = 100;
+  unsigned ySize = 20;
+	vectSetValue(pos, 0, -ySize*boxSmallR, 0);
+	InitGranularHPlane(ip, dem_ptr->sand+ip, pos, xSize, ySize, boxSmallR, granDensity);
   //--------------------------------
   //InitDemonHT(dem_ptr);
 }
@@ -144,7 +172,7 @@ void InitDemon2Gran(Demon *dem_ptr)
 //-------------------------------------------------------------------------
 void TimeIntergration(Demon *dem_ptr)
 {
-  ClearHashTable(&(dem_ptr->sand_ht));
+  //ClearHashTable(&(dem_ptr->sand_ht));
   vect temp;
   for(unsigned ip = 0; ip < dem_ptr->num; ip ++)
   {
@@ -155,14 +183,18 @@ void TimeIntergration(Demon *dem_ptr)
 //-------------------------------------------------------------------------
 void ComputeForce(Demon *dem_ptr)
 {
+  /// For denmon 'gran pull'.
   for(unsigned ig = 0; ig < dem_ptr->num; ig++) {
     for(unsigned jg = ig+1; jg < dem_ptr->num; jg++) {
       ComputeGranularForce(dem_ptr->sand + ig, dem_ptr->sand + jg);
     }
   }
-	return;
+  vect extForce;
+  vectSetValue(extForce, 0, 0, 10.5);
+  //vectAdd(dem_ptr->sand[0].component[1].force, extForce);
 	/*
 	*/
+	return;
   for(unsigned ip = 0; ip < dem_ptr->num; ip ++)
   {
     Granular *cur_g = dem_ptr->sand + ip;
@@ -226,7 +258,7 @@ void SaveDemon(const Demon *dem_ptr, FILE *fp)
 //-------------------------------------------------------------------------
 void FreeDemon(Demon *dem_ptr) {
 	if(dem_ptr == NULL) return;
-	FreeHashTable(&(dem_ptr->sand_ht));
+	//FreeHashTable(&(dem_ptr->sand_ht));
 	for(unsigned is = 0; is < dem_ptr->num; is ++) {
 		FreeGranular(&(dem_ptr->sand[is]));
 	}

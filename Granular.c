@@ -19,10 +19,8 @@ void InitBoxGranular(unsigned index, Granular *gran, const vect pos,
   vectSetZero((gran->angularMomentum));
 
   //--------------------------------
-  if(gran->component != NULL)
-  {
-    free(gran->component);
-  }
+  FreeGranular(gran);
+
   gran->num = 9;
   gran->component = (Particle*)malloc(sizeof(Particle)*gran->num);
   gran->offset = (vect*)malloc(sizeof(vect)*gran->num);
@@ -95,12 +93,13 @@ void InitGranularHPlane(unsigned index, Granular *gran, const vect min_pos,
 	gran->num = l*w;
 	gran->component = (Particle*) malloc(sizeof(Particle)*gran->num);
 	gran->offset = (vect*) malloc(sizeof(vect)*gran->num);
-	float d = radius*2;
+	float d = radius*2*0.618;
   for (unsigned ip = 0; ip < gran->num; ip++) {
     vectSetValue(gran->offset+ip, (ip%l)*d, (ip/l)*d, 0);
     vect pos;
     vectAddTo(pos, min_pos, gran->offset+ip);
     InitParticle(gran->component+ip, pos, radius);
+    vectSubstractTo(gran->offset[ip], pos, gran->position);
 	}
   //--------------------------------
   /*
@@ -112,14 +111,7 @@ void InitGranularHPlane(unsigned index, Granular *gran, const vect min_pos,
 //-------------------------------------------------------------------------
 void ComputeGranularForce(Granular *iG, Granular *jG)
 {
-  unsigned i = 0;
-  char name[4];
 	for(unsigned ip = 0; ip < iG->num; ip++) {
-    /*
-    sprintf(name, "%02u", i++);
-    print_vect(iG->component[ip].force, name); 
-    printf("\n");
-    */
 		for(unsigned jp = 0; jp < jG->num; jp ++) {
 			ComputeParticleForce(iG->component + ip, jG->component + jp);
 		}
@@ -166,11 +158,13 @@ void GranularTimeIntergration(Granular *iG, float time_step)
 	vectScaleTo(iG->acceleration, sumForce, 1.0/iG->mass);
 	vectAdd(iG->acceleration, GRAVITY);
 	vectScaleAdd(iG->velocity, iG->acceleration, time_step);
+	vectScaleAdd(iG->position, iG->velocity, time_step);
   for(unsigned ip = 0; ip < iG->num; ip++) {
     vectCopy(iG->component[ip].velocity, iG->velocity);
     vectAddCrossProduct(iG->component[ip].velocity,
         iG->angularVelocity, iG->offset[ip]);
     UpdateParticlePosition(iG->component+ip, time_step);
+    vectSubstractTo(iG->offset[ip], iG->component[ip].position, iG->position);
   }
 	return;
 }
@@ -205,6 +199,7 @@ void FreeGranular(Granular *gran)
 	if(gran->num > 0 && gran->component != NULL)
 	{
 		free(gran->component);
+  printf("$$%u\n", gran->index);
 		free(gran->offset);
 		gran->num = 0;
 	}
