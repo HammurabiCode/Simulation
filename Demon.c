@@ -41,6 +41,27 @@ void InitDemonBox(Demon *dem_ptr, const vect origin,
   InitDemonHT(dem_ptr);
 }
 //-------------------------------------------------------------------------
+void InitDemonGranPlane(Demon *dem_ptr) {
+  dem_ptr->time_step = 0.001f;
+  dem_ptr->num = 1;
+  dem_ptr->sand = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
+  
+  vect pos;
+  vectSetZero(pos);
+  float boxBigR = 0.4f;
+  float boxSmallR = 0.2f;
+  float granDensity= 2.0f;
+  float granEdge = ((boxBigR + boxSmallR)/sqrt(3.0)+boxSmallR);
+  unsigned ip = 0;
+  //--------------------------------
+	vectSetValue(pos,	boxSmallR*2*10, boxSmallR*2*2, granEdge+boxSmallR*10);
+	InitBoxGranular(ip, dem_ptr->sand+ip, pos, boxBigR, boxSmallR, granDensity); 
+	vectSetValue(dem_ptr->sand[ip].velocity, 6.18, 0, 0);
+	ip++;
+  //--------------------------------
+  //InitDemonHT(dem_ptr);
+}
+//-------------------------------------------------------------------------
 void InitDemonGranPull(Demon *dem_ptr) {
   dem_ptr->time_step = 0.001f;
   dem_ptr->num = 2;
@@ -188,6 +209,7 @@ void ComputeForce(Demon *dem_ptr)
     for(unsigned jg = ig+1; jg < dem_ptr->num; jg++) {
       ComputeGranularForce(dem_ptr->sand + ig, dem_ptr->sand + jg);
     }
+    GranApplyBound(dem_ptr->sand+ig);
   }
   vect extForce;
   vectSetValue(extForce, 0, 0, 10.5);

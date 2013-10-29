@@ -18,11 +18,21 @@ void PartApplyBound(Particle * ip) {
   const static float lowBound = 0;
   vect vBoundForce;
   vectSetZero(vBoundForce);
-	float sKesi = radius + lowBound - ip->position[2]; 
+	float sKesi = ip->radius + lowBound - ip->position[2]; 
 	if(sKesi > 0.0f) {
-    vect vUp;
-    vectSetZero(vUp);
-    vUp[2] = 1;
+    float sNorForce = 
+      COEF_DAMPING*pow(sKesi, COEF_ALPHA)*ip->velocity[2]+COEF_RESTORATION*pow(sKesi, COEF_BELTA);
+    //printf("%f\n", sNorForce);
+    vect vShearVelo;
+    vectCopy(vShearVelo, ip->velocity);
+    vShearVelo[2] = 0;
+    float sShearCoulomb = sNorForce*COEF_COULOMB/vectGetLength(vShearVelo);
+    float sShearForce = COEF_KT > sShearCoulomb ? sShearForce : COEF_KT;
+    vect vContactForce;
+    vectScaleTo(vContactForce, vShearVelo, sShearForce);
+    vContactForce[2] += sNorForce;
+    vectScaleAdd(ip->force, vContactForce, 1);
+    //print_vect(vContactForce, "");
   }
 }
 void ComputeParticleForce(Particle *ip, Particle *jp) {

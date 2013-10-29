@@ -109,8 +109,15 @@ void InitGranularHPlane(unsigned index, Granular *gran, const vect min_pos,
   */
 }
 //-------------------------------------------------------------------------
-void GranApplyBound(Granular *iG);
 void ComputeGranularForce(Granular *iG, Granular *jG)
+{
+	for(unsigned ip = 0; ip < iG->num; ip++) {
+    for(unsigned jp = 0; jp < jG->num; jp++) {
+      ComputeParticleForce(iG->component+ip, jG->component+jp);
+    }
+	}
+}
+void GranApplyBound(Granular *iG)
 {
 	for(unsigned ip = 0; ip < iG->num; ip++) {
     PartApplyBound(iG->component+ip);

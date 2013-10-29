@@ -21,6 +21,7 @@ enum {
   INIT_FALL_SHPERE,
   INIT_THROW_SHPERE,
   INIT_GRAN_PULL,
+  INIT_GRAN_PLANE,
   INIT_FUNC_NUM
 };
 char filenameList[INIT_FUNC_NUM][128] = {
@@ -28,6 +29,7 @@ char filenameList[INIT_FUNC_NUM][128] = {
   "demon-fall",
   "demon-throw",
   "gran-pull",
+  "gran-plane",
 };
 
 const static unsigned PART_NUM = 2;
@@ -47,7 +49,8 @@ int main(int argc, char *argv[])
     InitDemonPush,
     InitDemonFall,
     InitDemonThrow,
-    InitDemonGranPull
+    InitDemonGranPull,
+    InitDemonGranPlane
   };
       
 
@@ -75,7 +78,7 @@ int main(int argc, char *argv[])
 	povAddLight(&pov1, &light1);
 	povAddInclude(&pov1, "colors");
 
-  unsigned iCurDemon = INIT_GRAN_PULL; 
+  unsigned iCurDemon = INIT_GRAN_PLANE; 
   //for(iCurDemon = 0; iCurDemon < INIT_FUNC_NUM; iCurDemon ++) 
   {
     (initList[iCurDemon])(&d1);
@@ -87,7 +90,7 @@ int main(int argc, char *argv[])
     system(cmd);
     sprintf(cmd, "mkdir out/%s/pov", filenameList[iCurDemon]);
     system(cmd);
-    for (unsigned iFrame = 0; iFrame < 100; iFrame ++) {
+    for (unsigned iFrame = 0; iFrame < 3200; iFrame ++) {
       if (iFrame % output_rate == 0) {
         //sprintf(strFileName, "/home/hammurabi/toShare/demon-1/pov/GroundGranular%03u.pov", iFrame/output_rate);
         sprintf(strFileName, "out/%s/pov/%03u.pov", filenameList[iCurDemon], iFrame/output_rate);
