@@ -43,7 +43,7 @@ void InitDemonBox(Demon *dem_ptr, const vect origin,
 //-------------------------------------------------------------------------
 void InitDemonGranPull(Demon *dem_ptr) {
   dem_ptr->time_step = 0.001f;
-  dem_ptr->num = 1;
+  dem_ptr->num = 2;
   dem_ptr->sand = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
   
   vect pos;

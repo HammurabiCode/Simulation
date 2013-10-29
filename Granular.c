@@ -109,12 +109,11 @@ void InitGranularHPlane(unsigned index, Granular *gran, const vect min_pos,
   */
 }
 //-------------------------------------------------------------------------
+void GranApplyBound(Granular *iG);
 void ComputeGranularForce(Granular *iG, Granular *jG)
 {
 	for(unsigned ip = 0; ip < iG->num; ip++) {
-		for(unsigned jp = 0; jp < jG->num; jp ++) {
-			ComputeParticleForce(iG->component + ip, jG->component + jp);
-		}
+    PartApplyBound(iG->component+ip);
 	}
 }
 void GranularTimeIntergration(Granular *iG, float time_step)
@@ -199,7 +198,6 @@ void FreeGranular(Granular *gran)
 	if(gran->num > 0 && gran->component != NULL)
 	{
 		free(gran->component);
-  printf("$$%u\n", gran->index);
 		free(gran->offset);
 		gran->num = 0;
 	}

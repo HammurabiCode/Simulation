@@ -37,6 +37,7 @@ void InitGranularHPlane(unsigned index, Granular *gran, const vect min_pos,
 void InitGranularSphere(unsigned index, Granular *gran, const vect pos,
     float radius, float density);
 void ComputeGranularForce(Granular *iG, Granular *jG);
+void GranApplyBound(Granular *iG);
 void GranularTimeIntergration(Granular *, float time_step);
 void InitGranularInertia(Granular *);
 void FreeGranular(Granular *);

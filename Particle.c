@@ -14,6 +14,17 @@ void InitParticle(Particle *p, const vect pos, float r)
 	vectSetZero(p->force);
 	return;
 }
+void PartApplyBound(Particle * ip) {
+  const static float lowBound = 0;
+  vect vBoundForce;
+  vectSetZero(vBoundForce);
+	float sKesi = radius + lowBound - ip->position[2]; 
+	if(sKesi > 0.0f) {
+    vect vUp;
+    vectSetZero(vUp);
+    vUp[2] = 1;
+  }
+}
 void ComputeParticleForce(Particle *ip, Particle *jp) {
 	vect vPosNorm;
 	vectSubstractTo(vPosNorm, jp->position, ip->position);
