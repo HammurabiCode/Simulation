@@ -23,7 +23,7 @@ void InitDemonBox(Demon *dem_ptr, const vect origin,
   vect pos;
   vectSetZero(pos);
   float boxBigR = 0.4f;
-  float boxSmallR = 0.2f;
+  float boxSmallR = 0.15f;
   float granDensity= 2.0f;
   //dem_ptr->max_radius= boxBigR + boxSmallR*2;
   dem_ptr->max_radius= ((boxBigR + boxSmallR)/sqrt(3.0)+boxSmallR);
@@ -39,6 +39,36 @@ void InitDemonBox(Demon *dem_ptr, const vect origin,
 				ip ++;
       }
   InitDemonHT(dem_ptr);
+}
+//-------------------------------------------------------------------------
+void InitDemonGranPile(Demon *dem_ptr) {
+  unsigned xNum = 1;
+  unsigned yNum = 1;
+  unsigned zNum = 1;
+  dem_ptr->time_step = 0.001f;
+  dem_ptr->num = xNum*yNum*zNum;
+  dem_ptr->sand = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
+  
+  vect pos;
+  vectSetZero(pos);
+  float boxBigR = 0.4f;
+  float boxSmallR = 0.2f;
+  float granDensity= 2.0f;
+  float granEdge = ((boxBigR + boxSmallR)/sqrt(3.0)+boxSmallR);
+  vectSetValue(dem_ptr->vDisplayOffset, -granEdge*(xNum*2+10), 0, 0);
+  vect vMinPos;
+  vectSetValue(vMinPos, granEdge, granEdge, granEdge);
+  //--------------------------------
+  for (unsigned ip = 0; ip < dem_ptr->num; ip ++) {
+    vect vOffset;
+    vectSetValue(vOffset, ip%xNum, ip/xNum%yNum, ip/(xNum*yNum) + 2);
+    vectScale(vOffset, granEdge*2);
+    vectAdd(vOffset, vMinPos);
+    InitBoxGranular(ip, dem_ptr->sand+ip, vOffset, boxBigR, boxSmallR, granDensity); 
+    //vectSetValue(dem_ptr->sand[ip].velocity, 6.18, 0, 0);
+  }
+  //--------------------------------
+  //InitDemonHT(dem_ptr);
 }
 //-------------------------------------------------------------------------
 void InitDemonGranPlane(Demon *dem_ptr) {
@@ -275,7 +305,9 @@ void SaveDemon(const Demon *dem_ptr, FILE *fp)
   }
   fprintf(fp, "}\n");
   fprintf(fp, "object {\n\t%s\n\ttranslate <%f, %f, %f>\n\trotate <%f, %f, %f>\n}\n",
-      obj_name, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+      obj_name, dem_ptr->vDisplayOffset[0],
+      dem_ptr->vDisplayOffset[2],
+      dem_ptr->vDisplayOffset[1], 0.0, 0.0, 0.0);
 }
 //-------------------------------------------------------------------------
 void FreeDemon(Demon *dem_ptr) {

@@ -15,22 +15,6 @@ float GetKr(const Particle *p1, const Particle *p2)
   return 0.75f/ result;
 }
 */
-typedef void (*InitDemonFunc)(Demon *);
-enum {
-  INIT_PUSH_SHPERE,
-  INIT_FALL_SHPERE,
-  INIT_THROW_SHPERE,
-  INIT_GRAN_PULL,
-  INIT_GRAN_PLANE,
-  INIT_FUNC_NUM
-};
-char filenameList[INIT_FUNC_NUM][128] = {
-  "demon-push",
-  "demon-fall",
-  "demon-throw",
-  "gran-pull",
-  "gran-plane",
-};
 
 const static unsigned PART_NUM = 2;
 
@@ -45,57 +29,49 @@ int main(int argc, char *argv[])
 
 	//InitDemonBox(&d1, or, 4, 4, 4);
 	//InitDemonGroGra(&d1);
-  const InitDemonFunc initList[INIT_FUNC_NUM] = {
-    InitDemonPush,
-    InitDemonFall,
-    InitDemonThrow,
-    InitDemonGranPull,
-    InitDemonGranPlane
-  };
-      
 
 	pov pov1;
   pov1.num_light = 0;
   pov1.num_include= 0;
 	//vectSetValue(&(pov1.camera.location), 10, 10, 10);
 	//vectSetValue(&(pov1.camera.lookAt), 0, 0, 0);
-	vectSetValue(&(pov1.camera.location), 10, 15, 5);
-	vectSetValue(&(pov1.camera.lookAt), 10, 0, 0);
+	vectSetValue(&(pov1.camera.location), 0, 15, 5);
+	vectSetValue(&(pov1.camera.lookAt), 0, 0, 0);
 
 	pov_light light1;
-	vectSetValue(&(light1.location), 10, -10, 10);
+	vectSetValue(&(light1.location), 20, 0, 20);
 	lightSetColor(&light1, "White");
 	povAddLight(&pov1, &light1);
-	vectSetValue(&(light1.location), -10, 10, 10);
+	vectSetValue(&(light1.location), -20, 0, 20);
 	lightSetColor(&light1, "White");
 	povAddLight(&pov1, &light1);
-	vectSetValue(&(light1.location), -10, -10, 10);
+	vectSetValue(&(light1.location), 0, -20, 20);
 	lightSetColor(&light1, "White");
 	povAddLight(&pov1, &light1);
-
-	vectSetValue(&(light1.location), 10, 10, 10);
+	vectSetValue(&(light1.location), 0, 20, 20);
 	lightSetColor(&light1, "White");
 	povAddLight(&pov1, &light1);
 	povAddInclude(&pov1, "colors");
 
-  unsigned iCurDemon = INIT_GRAN_PLANE; 
+  unsigned iCurDemon = INIT_GRAN_PILE;
   //for(iCurDemon = 0; iCurDemon < INIT_FUNC_NUM; iCurDemon ++) 
   {
     (initList[iCurDemon])(&d1);
 
     pov1.dem_scene = &d1;
-    unsigned output_rate = (unsigned)(1.0/60.0/d1.time_step);
+    unsigned output_rate = (unsigned)(1.0/25.0/d1.time_step);
     char cmd[256];
     sprintf(cmd, "mkdir out/%s", filenameList[iCurDemon]);
     system(cmd);
     sprintf(cmd, "mkdir out/%s/pov", filenameList[iCurDemon]);
     system(cmd);
-    for (unsigned iFrame = 0; iFrame < 3200; iFrame ++) {
+    sprintf(cmd, "rm out/%s/pov/*.pov", filenameList[iCurDemon]);
+    system(cmd);
+    for (unsigned iFrame = 0; iFrame < 20000; iFrame ++) {
       if (iFrame % output_rate == 0) {
         //sprintf(strFileName, "/home/hammurabi/toShare/demon-1/pov/GroundGranular%03u.pov", iFrame/output_rate);
         sprintf(strFileName, "out/%s/pov/%03u.pov", filenameList[iCurDemon], iFrame/output_rate);
-        //printf("%f\t%f\t%f\n", d1.sand[0].component[0].position[0], d1.sand[0].component[0].position[1], d1.sand[0].component[0].position[2]);
-        //print_vect(d1.sand->component[0].position, "");
+        printf("%f\t%f\t%f\n", d1.sand[0].component[0].position[0], d1.sand[0].component[0].position[1], d1.sand[0].component[0].position[2]);
         if( 0 == povSave(&pov1, strFileName)) {
           printf("Can't open file: %s\n", strFileName);
           return -1;

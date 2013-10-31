@@ -10,6 +10,7 @@ typedef struct
   Granular *sand;
   float max_radius;
   HashTable sand_ht;
+  vect vDisplayOffset;
 } Demon;
 
 void InitDemonHT(Demon*);
@@ -22,10 +23,37 @@ void InitDemonThrow(Demon *dem_ptr);
 void InitDemonFall(Demon *dem_ptr);
 void InitDemonGranPull(Demon *dem_ptr);
 void InitDemonGranPlane(Demon *dem_ptr);
+void InitDemonGranPile(Demon *dem_ptr);
 
 void ComputeForce(Demon*);
 void TimeIntergration(Demon *);
 void SaveDemon(const Demon * , FILE *);
 void FreeDemon(Demon *);
 
+enum {
+  INIT_PUSH_SHPERE,
+  INIT_FALL_SHPERE,
+  INIT_THROW_SHPERE,
+  INIT_GRAN_PULL,
+  INIT_GRAN_PLANE,
+  INIT_GRAN_PILE,
+  INIT_FUNC_NUM
+};
+typedef void (*InitDemonFunc)(Demon *);
+const static InitDemonFunc initList[INIT_FUNC_NUM] = {
+  InitDemonPush,
+  InitDemonFall,
+  InitDemonThrow,
+  InitDemonGranPull,
+  InitDemonGranPlane,
+  InitDemonGranPile
+};
+const static char filenameList[INIT_FUNC_NUM][128] = {
+  "demon-push",
+  "demon-fall",
+  "demon-throw",
+  "gran-pull",
+  "gran-plane",
+  "gran-pile"
+};
 #endif
