@@ -1,7 +1,10 @@
 #ifndef PARTICLE_H_H
 #define PARTICLE_H_H
 #include "vect.h"
+#include "common.h"
+//typedef unsigned ParticleIndex;
 typedef struct{
+  ParticleIndex index;
   float radius;
   vect position;
   vect velocity;

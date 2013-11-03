@@ -51,22 +51,49 @@ void PartApplyBound(Particle * ip) {
   */
 	sKesi = ip->radius + zBound - ip->position[2]; 
 	if(sKesi > 0.0f) {
+    vect vContactForce;
+    vectSetZero(vContactForce);
+    float sRelVel = ip->velocity[2] > 0 ? 0.0 : -ip->velocity[2];
     float sNorForce = 
-      COEF_DAMPING*pow(sKesi, COEF_ALPHA)*ip->velocity[2]+COEF_RESTORATION*pow(sKesi, COEF_BELTA);
+      COEF_DAMPING*pow(sKesi, COEF_ALPHA)*sRelVel+COEF_RESTORATION*pow(sKesi, COEF_BELTA);
     vect vShearVelo;
     vectCopy(vShearVelo, ip->velocity);
     vShearVelo[2] = 0;
-    float sShearCoulomb = sNorForce*COEF_COULOMB/vectGetLength(vShearVelo);
-    float sShearForce = COEF_KT > sShearCoulomb ? sShearForce : COEF_KT;
-    vect vContactForce;
-    vectScaleTo(vContactForce, vShearVelo, sShearForce);
+    /*
+    if (fabs(vShearVelo[0]) < ZERO) vShearVelo[0] = 0.0f;
+    if (fabs(vShearVelo[1]) < ZERO) vShearVelo[1] = 0.0f;
+    */
+    float sShearVeloLen = vectGetLength(vShearVelo);
+    if (fabs(sShearVeloLen) > ZERO) {
+      //printf("%f>%f\n", aa, ZERO);
+      float sShearCoulomb = sNorForce*COEF_COULOMB/sShearVeloLen;
+      float sShearForce = COEF_KT > sShearCoulomb ? sShearForce : COEF_KT;
+      vectScaleTo(vContactForce, vShearVelo, sShearForce);
+      /*
+      */
+    }
     vContactForce[2] += sNorForce;
     vectAdd(ip->force, vContactForce);
   }
     /*
-  const static float SPRING_COEF = 1;
-  const static float DAMPING_COEF = 240;
-  const static float KT_COEF = 0;
+  int abc = 0;
+  // SPRING_COEF 1 DAMPING_COEF 5 KT_COEF 4
+  // * 1              5             4
+  // * 10             5             4
+  // * 100            5             4
+  // * 800            5             4
+  // * 1000           5             4
+  // * 1000           5             4
+  // KT_COEF
+  // * 0.5
+  // * 0.25
+  // * 0.05
+  // * 0.005
+  // * 0.0005
+  // * 0.0000
+  const static float SPRING_COEF = 5000;
+  const static float DAMPING_COEF = 0;
+  const static float KT_COEF = 6;
 	sKesi = ip->radius + zBound - ip->position[2]; 
 	if(sKesi > 0.0f) {
     vect vRelVelo;
@@ -90,6 +117,7 @@ void ComputeParticleForce(Particle *ip, Particle *jp) {
 	vectSubstractTo(vRelVelo, ip->velocity, jp->velocity);
 	//print_vect(vRelVelo, "vRelVelo:");
 	float sDKesi = vectDotProduct(vRelVelo, vPosNorm);
+  sDKesi = sDKesi > 0 ? 0.0 : sDKesi;
 	//printf("%f ", sDKesi);
 	float sNorForce = 
 		COEF_DAMPING*pow(sKesi, COEF_ALPHA)*sDKesi+COEF_RESTORATION*pow(sKesi, COEF_BELTA);

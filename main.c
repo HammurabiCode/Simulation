@@ -20,6 +20,11 @@ const static unsigned PART_NUM = 2;
 
 int main(int argc, char *argv[])
 {
+  vect zero;
+  vectSetZero(zero);
+  float a = vectGetLength(zero);
+  printf("%f\n", abs((int)(a)));
+  if (abs(a) > 0.0f) printf("aaa\n");
 	char *strFileName = (char*) malloc(sizeof(char)*1024);
 	
 	Demon d1;
@@ -53,7 +58,7 @@ int main(int argc, char *argv[])
 	povAddLight(&pov1, &light1);
 	povAddInclude(&pov1, "colors");
 
-  unsigned iCurDemon = INIT_GRAN_PILE;
+  unsigned iCurDemon = INIT_GRAN_ONE_NOR;
   //for(iCurDemon = 0; iCurDemon < INIT_FUNC_NUM; iCurDemon ++) 
   {
     (initList[iCurDemon])(&d1);
@@ -67,16 +72,19 @@ int main(int argc, char *argv[])
     system(cmd);
     sprintf(cmd, "rm out/%s/pov/*.pov", filenameList[iCurDemon]);
     system(cmd);
-    for (unsigned iFrame = 0; iFrame < 20000; iFrame ++) {
+    for (unsigned iFrame = 0; iFrame < 9000; iFrame ++) {
+      //printf("%u\n", iFrame);
       if (iFrame % output_rate == 0) {
         //sprintf(strFileName, "/home/hammurabi/toShare/demon-1/pov/GroundGranular%03u.pov", iFrame/output_rate);
         sprintf(strFileName, "out/%s/pov/%03u.pov", filenameList[iCurDemon], iFrame/output_rate);
-        printf("%f\t%f\t%f\n", d1.sand[0].component[0].position[0], d1.sand[0].component[0].position[1], d1.sand[0].component[0].position[2]);
+        //printf("%f\t%f\t%f\n", d1.sand[0].component[0].position[0], d1.sand[0].component[0].position[1], d1.sand[0].component[0].position[2]);
         if( 0 == povSave(&pov1, strFileName)) {
           printf("Can't open file: %s\n", strFileName);
           return -1;
         }
       }
+      printf("%04u:", iFrame);
+      GranularPrint(d1.sand);
       ComputeForce(&d1);
       TimeIntergration(&d1);
     }

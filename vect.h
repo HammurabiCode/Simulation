@@ -1,14 +1,11 @@
 #ifndef VECT_H_H
 #define VECT_H_H
 #include <math.h>
-#ifndef NULL
-#define NULL (0)
-#endif
-#define ZERO (1.0e-10)
-#define PI (3.1415926535358979)
+#include "common.h"
 
 typedef float real;
 typedef float vect[3];
+const static vect GRAVITY = {0, 0, -9.8};
 //-------------------------------------------------------------------------
 static inline void vectSetZero(vect v)
 {
@@ -105,10 +102,17 @@ static inline float vectNormalize(vect a)
   return len;
 }
 //-------------------------------------------------------------------------
+static inline vectCheckZero(vect v)
+{
+  for(int i = 0; i < 3; i ++) {
+    if (fabs(v[i]) < ZERO)
+      v[i] = 0;
+  }
+}
+//-------------------------------------------------------------------------
 static inline void print_vect(const vect v, const char *str)
 {
-  printf("%s: x=%f, y=%f, z=%f.", str, v[0], v[1], v[2]);
+  printf("%s:\t%f\t%f\t%f", str, v[0], v[1], v[2]);
 }
-const static vect GRAVITY = {0, 0, -9.8};
 //-------------------------------------------------------------------------
 #endif

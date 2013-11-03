@@ -23,6 +23,8 @@ void InitDemonThrow(Demon *dem_ptr);
 void InitDemonFall(Demon *dem_ptr);
 void InitDemonGranPull(Demon *dem_ptr);
 void InitDemonGranPlane(Demon *dem_ptr);
+void InitDemonGranOneShear(Demon *dem_ptr);
+void InitDemonGranOneNor(Demon *dem_ptr);
 void InitDemonGranPile(Demon *dem_ptr);
 
 void ComputeForce(Demon*);
@@ -37,6 +39,8 @@ enum {
   INIT_GRAN_PULL,
   INIT_GRAN_PLANE,
   INIT_GRAN_PILE,
+  INIT_GRAN_ONE_SHEAR,
+  INIT_GRAN_ONE_NOR,
   INIT_FUNC_NUM
 };
 typedef void (*InitDemonFunc)(Demon *);
@@ -46,7 +50,9 @@ const static InitDemonFunc initList[INIT_FUNC_NUM] = {
   InitDemonThrow,
   InitDemonGranPull,
   InitDemonGranPlane,
-  InitDemonGranPile
+  InitDemonGranPile,
+  InitDemonGranOneShear,
+  InitDemonGranOneNor
 };
 const static char filenameList[INIT_FUNC_NUM][128] = {
   "demon-push",
@@ -54,6 +60,8 @@ const static char filenameList[INIT_FUNC_NUM][128] = {
   "demon-throw",
   "gran-pull",
   "gran-plane",
-  "gran-pile"
+  "gran-pile",
+  "gran-one-shear",
+  "gran-one-nor"
 };
 #endif

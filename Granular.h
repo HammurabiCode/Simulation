@@ -2,6 +2,7 @@
 #define GRANULAR_H_H
 
 #include "Particle.h"
+#include "common.h"
 #include "vect.h"
 #include "mat.h"
 #include "quat.h"
@@ -12,6 +13,7 @@
 typedef struct
 {
 	unsigned index;
+	//ParticleIndex iStart;
   float mass;
   float density;
 
@@ -40,5 +42,6 @@ void ComputeGranularForce(Granular *iG, Granular *jG);
 void GranApplyBound(Granular *iG);
 void GranularTimeIntergration(Granular *, float time_step);
 void InitGranularInertia(Granular *);
+void GranularPrint(const Granular *gran);
 void FreeGranular(Granular *);
 #endif

@@ -5,7 +5,7 @@
 
 //----------------------------------------------------------------
 void InitBoxGranular(unsigned index, Granular *gran, const vect pos,
-		float bigR, float smallR, float density)
+    float bigR, float smallR, float density)
 {
 	gran->index = index;
 	gran->density = density;
@@ -147,8 +147,8 @@ void GranularTimeIntergration(Granular *iG, float time_step)
     //print_vect(iG->component[ip].force, "");
     vectAdd(dAngMom, iAngMom);
     vectAdd(sumForce, iG->component[ip].force);
-    vectSetZero(iG->component[ip].force);
   }
+  vectCheckZero(dAngMom);
   vectScaleAdd(iG->angularMomentum, dAngMom, time_step);
   quat dQuat;
   getDeltaQuat(dQuat, iG->angularVelocity, time_step);
@@ -160,18 +160,29 @@ void GranularTimeIntergration(Granular *iG, float time_step)
   matMulMat(matTemp, matRot, iG->inertiaInv);
   matMulMat(iG->inertiaInv, matTemp, matRotTran);
   matMulVect(iG->angularVelocity, iG->inertiaInv, iG->angularMomentum);
-  //print_vect(sumForce, "");
 	vectScaleTo(iG->acceleration, sumForce, 1.0/iG->mass);
 	vectAdd(iG->acceleration, GRAVITY);
 	vectScaleAdd(iG->velocity, iG->acceleration, time_step);
 	vectScaleAdd(iG->position, iG->velocity, time_step);
-  for(unsigned ip = 0; ip < iG->num; ip++) {
+  for (unsigned ip = 0; ip < iG->num; ip++) {
     vectCopy(iG->component[ip].velocity, iG->velocity);
+    //vectCheckZero(iG->angularVelocity);
     vectAddCrossProduct(iG->component[ip].velocity,
         iG->angularVelocity, iG->offset[ip]);
     UpdateParticlePosition(iG->component+ip, time_step);
     vectSubstractTo(iG->offset[ip], iG->component[ip].position, iG->position);
+    vectSetZero(iG->component[ip].force);
   }
+  /*
+  float dd = fabs(iG->offset[2][0]) - fabs(iG->offset[1][0]);
+  printf("%e, %e\n", dd, ZERO);
+  if (fabs(dd) > ZERO) {
+    for (unsigned ip = 0; ip < iG->num; ip++) {
+      print_vect(iG->offset[ip], "");
+      printf("\n");
+    }
+  }
+  */
 	return;
 }
 void InitGranularInertia(Granular *gran) {
@@ -200,6 +211,20 @@ void InitGranularInertia(Granular *gran) {
 	matInv(gran->inertiaInv, inertia);
 }
 //-------------------------------------------------------------------------
+void GranularPrint(const Granular *gran)
+{
+  //if (vectGetLength(gran->acceleration) < 10.0) return;
+  print_vect(gran->position, "Position");
+  printf("\t");
+  print_vect(gran->velocity, "Velocity");
+  printf("\t");
+  print_vect(gran->acceleration, "Acce");
+  printf("\t");
+  print_vect(gran->angularVelocity, "Angular");
+  printf("\t");
+  print_vect(gran->angularMomentum, "AngularMom");
+  printf("\n");
+}
 void FreeGranular(Granular *gran)
 {
 	if(gran->num > 0 && gran->component != NULL)
