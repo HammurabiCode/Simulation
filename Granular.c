@@ -5,11 +5,15 @@
 
 //----------------------------------------------------------------
 void InitBoxGranular(unsigned index, Granular *gran, const vect pos,
+    ParticleIndex startIndex, Particle *startPart, vect* startOffset,
     float bigR, float smallR, float density)
 {
+  FreeGranular(gran);
+
 	gran->index = index;
 	gran->density = density;
 	gran->mass = PI*4.0*(bigR*bigR*bigR + smallR*smallR*smallR*8)/3.0;
+
   //--------------------------------
   //quatenion inertia
   vectCopy((gran->position), pos);
@@ -19,12 +23,13 @@ void InitBoxGranular(unsigned index, Granular *gran, const vect pos,
   vectSetZero((gran->angularMomentum));
 
   //--------------------------------
-  FreeGranular(gran);
-
   gran->num = 9;
-  gran->component = (Particle*)malloc(sizeof(Particle)*gran->num);
-  gran->offset = (vect*)malloc(sizeof(vect)*gran->num);
-  InitParticle(gran->component, pos, bigR);
+  gran->iStart = startIndex;
+  gran->component = startPart;
+  gran->offset = startOffset;
+
+  //--------------------------------
+  InitParticle(startIndex++, gran->component, pos, gran->index, bigR);
 	vectSetZero(gran->offset);
   float dist = (bigR + smallR)/sqrt(3.0);
   for(unsigned i = 1; i < 9; i++) {
@@ -35,7 +40,7 @@ void InitBoxGranular(unsigned index, Granular *gran, const vect pos,
     vectSetValue((gran->offset+i), x*dist, y*dist, z*dist);
     vect offset;
     vectAddTo(offset, pos, gran->offset[i]);
-    InitParticle(gran->component+i, offset, smallR);
+    InitParticle(startIndex++, gran->component+i, offset, gran->index, smallR);
   }
   //--------------------------------
 	setQuatZero(&(gran->quaternion));
@@ -46,42 +51,49 @@ void InitBoxGranular(unsigned index, Granular *gran, const vect pos,
 
 //----------------------------------------------------------------
 void InitGranularSphere(unsigned index, Granular *gran, const vect pos,
+    ParticleIndex startIndex, Particle *startPart, vect* startOffset,
     float radius, float density) {
-	if (gran->num != 0) {
-		FreeGranular(gran);
-	}
-
+  FreeGranular(gran);
+  //--------------------------------
 	gran->index = index;
 	gran->mass = density*PI*4.0*radius*radius*radius/3.0;
 	gran->density	= density;
 
+  //--------------------------------
 	vectCopy(gran->position, pos);
 	vectSetZero(gran->velocity);
 	vectSetZero(gran->acceleration);
 	vectSetZero(gran->angularMomentum);
 	vectSetZero(gran->angularVelocity);
 
+  //--------------------------------
 	gran->num = 1;
-	gran->component = (Particle*) malloc(sizeof(Particle)*gran->num);
-	gran->offset = (vect*) malloc(sizeof(vect)*gran->num);
-  InitParticle(gran->component+0, pos, radius);
+  gran->iStart = startIndex;
+  gran->component = startPart;
+  gran->offset = startOffset;
+  
+  //--------------------------------
+  InitParticle(startIndex, gran->component+0, pos, gran->index, radius);
   vectSetValue(gran->offset+0, 0, 0, 0);
   //--------------------------------
+  /*
 	setQuatZero(&(gran->quaternion));
 	gran->quaternion[0] = 1.0f;
 	InitGranularInertia(gran);
+  */
 }
 //----------------------------------------------------------------
 void InitGranularHPlane(unsigned index, Granular *gran, const vect min_pos,
+    ParticleIndex startIndex, Particle *startPart, vect* startOffset,
 		unsigned l, unsigned w, float radius, float density) {
-	if (gran->num != 0) {
-		FreeGranular(gran);
-	}
+  FreeGranular(gran);
 
+  //--------------------------------
 	gran->index = index;
 	gran->mass = -1.0f;
 	gran->density	= density;
 
+  //--------------------------------
 	vect centerOffset;
 	vectSetValue(centerOffset, (l-1)*radius, (w-1)*radius, 0);
 	vectAddTo(gran->position, centerOffset, min_pos);
@@ -90,15 +102,19 @@ void InitGranularHPlane(unsigned index, Granular *gran, const vect min_pos,
 	vectSetZero(gran->angularMomentum);
 	vectSetZero(gran->angularVelocity);
 
+  //--------------------------------
 	gran->num = l*w;
-	gran->component = (Particle*) malloc(sizeof(Particle)*gran->num);
-	gran->offset = (vect*) malloc(sizeof(vect)*gran->num);
+  gran->iStart = startIndex;
+  gran->component = startPart;
+  gran->offset = startOffset;
+
+  //--------------------------------
 	float d = radius*2*0.618;
   for (unsigned ip = 0; ip < gran->num; ip++) {
     vectSetValue(gran->offset+ip, (ip%l)*d, (ip/l)*d, 0);
     vect pos;
     vectAddTo(pos, min_pos, gran->offset+ip);
-    InitParticle(gran->component+ip, pos, radius);
+    InitParticle(startIndex++, gran->component+ip, pos, gran->index, radius);
     vectSubstractTo(gran->offset[ip], pos, gran->position);
 	}
   //--------------------------------
@@ -227,10 +243,9 @@ void GranularPrint(const Granular *gran)
 }
 void FreeGranular(Granular *gran)
 {
-	if(gran->num > 0 && gran->component != NULL)
-	{
-		free(gran->component);
-		free(gran->offset);
+	if(gran->num > 0) {
+    gran->component = NULL;
+    gran->offset = NULL;
 		gran->num = 0;
 	}
 }

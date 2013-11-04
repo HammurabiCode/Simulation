@@ -6,9 +6,11 @@ void InitParticleA(Particle *par_list, unsigned num)
 {
 }
 
-void InitParticle(Particle *p, const vect pos, float r)
+void InitParticle(ParticleIndex pIndex, Particle *, const vect, GranularIndex gIndex, float r);
 {
+  p->index = pIndex;
 	p->radius = r;
+  p->granIndex = gIndex;
 	vectCopy(p->position, pos);
 	vectSetZero(p->velocity);
 	vectSetZero(p->force);

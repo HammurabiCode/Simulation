@@ -7,6 +7,7 @@ typedef struct
 {
   float time_step;
   unsigned num;
+  Particle *ptrPartPool;
   Granular *sand;
   float max_radius;
   HashTable sand_ht;

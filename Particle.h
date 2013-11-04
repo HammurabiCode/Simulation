@@ -5,6 +5,7 @@
 //typedef unsigned ParticleIndex;
 typedef struct{
   ParticleIndex index;
+  GranularIndex granIndex;
   float radius;
   vect position;
   vect velocity;
@@ -19,7 +20,7 @@ typedef struct{
 } Particle;
 
 void InitParticleA(Particle *p_list, unsigned num);
-void InitParticle(Particle *, const vect, float);
+void InitParticle(Particle *, const vect, GranularIndex gIndex, float r);
 void ComputeParticleForce(Particle *, Particle *);
 void PartApplyBound(Particle *);
 static inline
