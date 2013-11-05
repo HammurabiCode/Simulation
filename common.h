@@ -6,4 +6,5 @@ typedef unsigned ParticleIndex;
 #ifndef NULL
 #define NULL (0)
 #endif
+//#define ZERO_GRAVITY
 #endif

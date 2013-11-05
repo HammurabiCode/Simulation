@@ -117,7 +117,7 @@ void ComputeParticleForce(Particle *ip, Particle *jp) {
 	vectSubstractTo(vRelVelo, ip->velocity, jp->velocity);
 	//print_vect(vRelVelo, "vRelVelo:");
 	float sDKesi = vectDotProduct(vRelVelo, vPosNorm);
-  sDKesi = sDKesi > 0 ? 0.0 : sDKesi;
+  //sDKesi = sDKesi > 0 ? 0.0 : sDKesi;
 	//printf("%f ", sDKesi);
 	float sNorForce = 
 		COEF_DAMPING*pow(sKesi, COEF_ALPHA)*sDKesi+COEF_RESTORATION*pow(sKesi, COEF_BELTA);

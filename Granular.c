@@ -2,6 +2,7 @@
 #include "vect.h" 
 #include "mat.h" 
 #include "quat.h"
+#include "common.h"
 
 //----------------------------------------------------------------
 void InitBoxGranular(unsigned index, Granular *gran, const vect pos,
@@ -128,7 +129,9 @@ void GranularTimeIntergration(Granular *iG, float time_step)
 	if (iG->mass <= 0.0f) return;
   if (iG->num == 1) {
     vectScaleTo(iG->acceleration, iG->component[0].force, 1.0/iG->mass);
+#ifndef ZERO_GRAVITY
     vectAdd(iG->acceleration, GRAVITY);
+#endif
     vectScaleAdd(iG->velocity, iG->acceleration, time_step);
     vectScaleAdd(iG->position, iG->velocity, time_step);
     vectCopy(iG->component[0].velocity, iG->velocity);
@@ -161,7 +164,9 @@ void GranularTimeIntergration(Granular *iG, float time_step)
   matMulMat(iG->inertiaInv, matTemp, matRotTran);
   matMulVect(iG->angularVelocity, iG->inertiaInv, iG->angularMomentum);
 	vectScaleTo(iG->acceleration, sumForce, 1.0/iG->mass);
+#ifndef ZERO_GRAVITY
 	vectAdd(iG->acceleration, GRAVITY);
+#endif
 	vectScaleAdd(iG->velocity, iG->acceleration, time_step);
 	vectScaleAdd(iG->position, iG->velocity, time_step);
   for (unsigned ip = 0; ip < iG->num; ip++) {
