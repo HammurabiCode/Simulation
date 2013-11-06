@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 	povAddLight(&pov1, &light1);
 	povAddInclude(&pov1, "colors");
 
-  unsigned iCurDemon = INIT_GRAN_PILE;
+  unsigned iCurDemon = INIT_GRAN_2_COLLIDE;
   //for(iCurDemon = 0; iCurDemon < INIT_FUNC_NUM; iCurDemon ++) 
   {
     (initList[iCurDemon])(&d1);
@@ -86,8 +86,10 @@ int main(int argc, char *argv[])
           return -1;
         }
       }
-      printf("%04u:", iFrame);
+      /*
+      printf("%04u\n", iFrame);
       GranularPrint(d1.sand);
+      */
       ComputeForce(&d1);
       TimeIntergration(&d1);
     }

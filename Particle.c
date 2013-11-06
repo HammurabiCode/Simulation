@@ -53,27 +53,24 @@ void PartApplyBound(Particle * ip) {
 	if(sKesi > 0.0f) {
     vect vContactForce;
     vectSetZero(vContactForce);
-    float sRelVel = ip->velocity[2] > 0 ? 0.0 : -ip->velocity[2];
+    //float sRelVel = ip->velocity[2] > 0 ? ip->velocity[2] : 0.0f;
+    float sRelVel = -ip->velocity[2];
     float sNorForce = 
       COEF_DAMPING*pow(sKesi, COEF_ALPHA)*sRelVel+COEF_RESTORATION*pow(sKesi, COEF_BELTA);
+      /*
     vect vShearVelo;
     vectCopy(vShearVelo, ip->velocity);
     vShearVelo[2] = 0;
-    /*
-    if (fabs(vShearVelo[0]) < ZERO) vShearVelo[0] = 0.0f;
-    if (fabs(vShearVelo[1]) < ZERO) vShearVelo[1] = 0.0f;
-    */
     float sShearVeloLen = vectGetLength(vShearVelo);
     if (fabs(sShearVeloLen) > ZERO) {
-      //printf("%f>%f\n", aa, ZERO);
       float sShearCoulomb = sNorForce*COEF_COULOMB/sShearVeloLen;
       float sShearForce = COEF_KT > sShearCoulomb ? sShearForce : COEF_KT;
       vectScaleTo(vContactForce, vShearVelo, sShearForce);
-      /*
-      */
     }
+      */
     vContactForce[2] += sNorForce;
-    vectAdd(ip->force, vContactForce);
+    print_vect(vContactForce, "");
+    vectScaleAdd(ip->force, vContactForce, 1);
   }
     /*
   int abc = 0;
@@ -129,6 +126,14 @@ void ComputeParticleForce(Particle *ip, Particle *jp) {
 	vect vContactForce;
 	vectScaleTo(vContactForce, vPosNorm, sNorForce);
 	vectScaleAdd(vContactForce, vShearVelo, sShearForce);
+  /*
+  if (vContactForce[0] != vContactForce[0] ||
+      vContactForce[1] != vContactForce[1] ||
+      vContactForce[2] != vContactForce[2]) {
+    print_vect(vContactForce, "");
+  }
+  */
+
 	vectScaleAdd((ip->force), vContactForce, -1);
 	vectScaleAdd((jp->force), vContactForce, 1);
 }

@@ -151,7 +151,7 @@ void InitDemonGran2Collide(Demon *dem_ptr) {
     ip++;
   }
   {
-    vectSetValue(pos, 1.0f, 0.0f, 2.0f);
+    vectSetValue(pos, 1.0f, 0.0f, 2.2f);
     InitBoxGranular(ip, dem_ptr->sand+ip, pos, boxBigR, boxSmallR, granDensity); 
     vectSetValue(dem_ptr->sand[ip].velocity, -3.14, 0, 0);
     ip++;
