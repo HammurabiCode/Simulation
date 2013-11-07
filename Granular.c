@@ -219,6 +219,7 @@ void InitGranularInertia(Granular *gran) {
 void GranularPrint(const Granular *gran)
 {
   //if (vectGetLength(gran->acceleration) < 10.0) return;
+  printf("%02u:", gran->index);
   print_vect(gran->position, "Position");
   printf("\t");
   print_vect(gran->velocity, "Velocity");

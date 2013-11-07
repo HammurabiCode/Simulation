@@ -87,11 +87,13 @@ int main(int argc, char *argv[])
         }
       }
       /*
-      printf("***\n%04u\n", iFrame);
-      for (unsigned ig = 0; ig < d1.num; ig ++) {
-        GranularPrint(d1.sand+ig);
-      }
       */
+      if (iFrame > 3360) {
+        printf("**********************************\n%04u\n", iFrame);
+        for (unsigned ig = 0; ig < d1.num; ig ++) {
+          GranularPrint(d1.sand+ig);
+        }
+      }
       ComputeForce(&d1);
       TimeIntergration(&d1);
     }
