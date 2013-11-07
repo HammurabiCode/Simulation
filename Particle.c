@@ -53,23 +53,24 @@ void PartApplyBound(Particle * ip) {
 	if(sKesi > 0.0f) {
     vect vContactForce;
     vectSetZero(vContactForce);
-    //float sRelVel = ip->velocity[2] > 0 ? ip->velocity[2] : 0.0f;
-    float sRelVel = -ip->velocity[2];
+    float sRelVel = ip->velocity[2] < 0 ? -ip->velocity[2] : 0.0f;
+    //float sRelVel = -ip->velocity[2];
     float sNorForce = 
       COEF_DAMPING*pow(sKesi, COEF_ALPHA)*sRelVel+COEF_RESTORATION*pow(sKesi, COEF_BELTA);
-      /*
     vect vShearVelo;
     vectCopy(vShearVelo, ip->velocity);
     vShearVelo[2] = 0;
     float sShearVeloLen = vectGetLength(vShearVelo);
     if (fabs(sShearVeloLen) > ZERO) {
       float sShearCoulomb = sNorForce*COEF_COULOMB/sShearVeloLen;
-      float sShearForce = COEF_KT > sShearCoulomb ? sShearForce : COEF_KT;
-      vectScaleTo(vContactForce, vShearVelo, sShearForce);
+      float sShearForce = COEF_KT > sShearCoulomb ? sShearCoulomb : COEF_KT;
+      vectScaleTo(vContactForce, vShearVelo, -sShearForce);
     }
-      */
     vContactForce[2] += sNorForce;
-    print_vect(vContactForce, "");
+    /*
+    print_vect(vContactForce, "bound contact");
+    printf("\n");
+    */
     vectScaleAdd(ip->force, vContactForce, 1);
   }
     /*
@@ -114,18 +115,22 @@ void ComputeParticleForce(Particle *ip, Particle *jp) {
 	vectSubstractTo(vRelVelo, ip->velocity, jp->velocity);
 	//print_vect(vRelVelo, "vRelVelo:");
 	float sDKesi = vectDotProduct(vRelVelo, vPosNorm);
-  //sDKesi = sDKesi > 0 ? 0.0 : sDKesi;
+  sDKesi = sDKesi < 0 ? 0.0 : sDKesi;
 	//printf("%f ", sDKesi);
 	float sNorForce = 
 		COEF_DAMPING*pow(sKesi, COEF_ALPHA)*sDKesi+COEF_RESTORATION*pow(sKesi, COEF_BELTA);
+	vect vContactForce;
+  vectSetZero(vContactForce);
+	vectScaleTo(vContactForce, vPosNorm, sNorForce);
 	vect vNormVelo, vShearVelo;
 	vectScaleTo(vNormVelo, vPosNorm, sDKesi);
 	vectSubstractTo(vShearVelo, vRelVelo, vNormVelo);
-	float sShearCoulomb = sNorForce*COEF_COULOMB/vectGetLength(vShearVelo);
-	float sShearForce = COEF_KT > sShearCoulomb ? sShearForce : COEF_KT;
-	vect vContactForce;
-	vectScaleTo(vContactForce, vPosNorm, sNorForce);
-	vectScaleAdd(vContactForce, vShearVelo, sShearForce);
+  float sShearVeloLen = vectGetLength(vShearVelo);
+  if (sShearVeloLen > ZERO) {
+    float sShearCoulomb = sNorForce*COEF_COULOMB/sShearVeloLen;
+    float sShearForce = COEF_KT > sShearCoulomb ? sShearCoulomb : COEF_KT;
+    vectScaleAdd(vContactForce, vShearVelo, -sShearForce);
+  }
   /*
   if (vContactForce[0] != vContactForce[0] ||
       vContactForce[1] != vContactForce[1] ||

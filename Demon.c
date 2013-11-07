@@ -65,7 +65,7 @@ void InitDemonGranOneShear(Demon *dem_ptr) {
     vectScale(vOffset, granEdge*2);
     vectAdd(vOffset, vMinPos);
     InitBoxGranular(ip, dem_ptr->sand+ip, vOffset, boxBigR, boxSmallR, granDensity); 
-    vectSetValue(dem_ptr->sand[ip].velocity, 6.18, 0, 0);
+    vectSetValue(dem_ptr->sand[ip].velocity, 3.18, 0, 0);
   }
   //--------------------------------
   //InitDemonHT(dem_ptr);
@@ -105,7 +105,7 @@ void InitDemonGranPile(Demon *dem_ptr) {
   unsigned yNum = 4;
   unsigned zNum = 4;
   dem_ptr->time_step = 0.001f;
-  dem_ptr->num = xNum*yNum*zNum;
+  dem_ptr->num = xNum*yNum*zNum + 0;
   dem_ptr->sand = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
   
   vect pos;
@@ -116,9 +116,10 @@ void InitDemonGranPile(Demon *dem_ptr) {
   float granEdge = ((boxBigR + boxSmallR)/sqrt(3.0)+boxSmallR);
   vectSetValue(dem_ptr->vDisplayOffset, -granEdge*(xNum*2), 0, 0);
   vect vMinPos;
-  vectSetValue(vMinPos, granEdge, granEdge, granEdge);
+  vectSetValue(vMinPos, granEdge, granEdge, granEdge*2);
   //--------------------------------
-  for (unsigned ip = 0; ip < dem_ptr->num; ip ++) {
+  unsigned ip = 0;
+  for (; ip < dem_ptr->num - 0; ip ++) {
     vect vOffset;
     vectSetValue(vOffset, ((int)(ip%xNum)), ip/xNum%yNum, ip/(xNum*yNum));
     vectScale(vOffset, granEdge*2);
@@ -126,6 +127,15 @@ void InitDemonGranPile(Demon *dem_ptr) {
     InitBoxGranular(ip, dem_ptr->sand+ip, vOffset, boxBigR, boxSmallR, granDensity); 
     //vectSetValue(dem_ptr->sand[ip].velocity, 6.18, 0, 0);
   }
+  //--------------------------------
+  /*
+  vect vOffset;
+  vectSetValue(vOffset, 1.5, 1.5, 3);
+  vectScale(vOffset, granEdge*2);
+  vectAdd(vOffset, vMinPos);
+  InitBoxGranular(ip, dem_ptr->sand+ip, vOffset, boxBigR, boxSmallR, granDensity); 
+  ip ++;
+  */
   //--------------------------------
   //InitDemonHT(dem_ptr);
 }
