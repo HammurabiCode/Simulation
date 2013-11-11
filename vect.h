@@ -93,6 +93,13 @@ static inline float vectGetDistance(const vect v1, const vect v2)
   return vectGetLength(t);
 }
 //-------------------------------------------------------------------------
+static inline float vectGetDist(const vect a, const b)
+{
+  vect vDist;
+  vectSubstractTo(vDist, a, b);
+  return vectGetLength(vDist);
+}
+//-------------------------------------------------------------------------
 static inline float vectNormalize(vect a)
 {
   float len = vectGetLength(a);

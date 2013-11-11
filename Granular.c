@@ -5,12 +5,13 @@
 #include "common.h"
 
 //----------------------------------------------------------------
-void InitBoxGranular(unsigned index, Granular *gran, const vect pos,
+void InitGranularBox(unsigned index, Granular *gran, const vect pos,
     float bigR, float smallR, float density)
 {
 	gran->index = index;
 	gran->density = density;
 	gran->mass = PI*4.0*(bigR*bigR*bigR + smallR*smallR*smallR*8)/3.0;
+	gran->radius = bigR + 2*smallR;
   //--------------------------------
   //quatenion inertia
   vectCopy((gran->position), pos);
@@ -55,6 +56,7 @@ void InitGranularSphere(unsigned index, Granular *gran, const vect pos,
 	gran->index = index;
 	gran->mass = density*PI*4.0*radius*radius*radius/3.0;
 	gran->density	= density;
+	gran->radius = radius;
 
 	vectCopy(gran->position, pos);
 	vectSetZero(gran->velocity);
@@ -230,6 +232,10 @@ void GranularPrint(const Granular *gran)
   printf("\t");
   print_vect(gran->angularMomentum, "AngularMom");
   printf("\n");
+  for (unsigned ip = 0; ip < gran->num; ip++) {
+    printf("%02u:", ip);
+    ParticlePrint(gran->component+ip);
+  }
 }
 void FreeGranular(Granular *gran)
 {

@@ -9,17 +9,17 @@ void InitHashGrid(HashGrid* hg)
   if(hg->content != NULL)
   {
     free(hg->content);
-    hg->content = (ParticleIndex*) malloc(sizeof(ParticleIndex)*hg->capacity);
+    hg->content = (HashContent*) malloc(sizeof(HashContent)*hg->capacity);
   }
 }
 //-------------------------------------
-void InsertHashGrid(HashGrid *hg, ParticleIndex e)
+void InsertHashGrid(HashGrid *hg, HashContent e)
 {
   if(hg->num == hg->capacity)
   {
     hg->capacity += HASH_GRID_INCR_CAPACITY;
-    ParticleIndex *ptr = (ParticleIndex*)malloc(sizeof(ParticleIndex)*hg->capacity);
-    memcpy(ptr, hg->content, hg->num*sizeof(ParticleIndex));
+    HashContent *ptr = (HashContent*)malloc(sizeof(HashContent)*hg->capacity);
+    memcpy(ptr, hg->content, hg->num*sizeof(HashContent));
     free(hg->content);
     hg->content = ptr;
   }
@@ -46,18 +46,33 @@ void InitHashTable(HashTable *ht, unsigned ts, const vect min_p, float cl)
 {
   ht->table_size = ts;
   ht->cell_length = cl;
-  vectCopy((ht->min_pos), min_p);
+  vectCopy(ht->min_pos, min_p);
   if(ht->content != NULL)
   {
     free(ht->content);
   }
   ht->content = (HashGrid*)malloc(sizeof(HashGrid)*ht->table_size);
+  memset(ht->content, 0, sizeof(HashGrid)*ht->table_size);
 }
 //-------------------------------------
-void InsertHashTable(HashTable *ht, const Granular *p)
+void InsertHashTable(HashTable *ht, const Granular *g)
 {
-  unsigned hv = HASH_VALUE(p->position, ht->min_pos, ht->cell_length, ht->table_size);
-  InsertHashGrid(ht->content+hv, p->index);
+  for (ParticleIndex ip = 0; ip < g->num; ip ++) {
+    unsigned hv = HASH_VALUE(g->component[ip].position,
+        ht->min_pos, ht->cell_length, ht->table_size);
+    InsertHashGrid(ht->content+hv, g->index);
+  }
+}
+//-------------------------------------
+void HashTablePrint(const HashTable *ht) {
+  for (unsigned iGrid = 0; iGrid < ht->table_size; iGrid ++) {
+    if (ht->content[iGrid].num == 0) continue;
+    printf("%03u:(%03u) ", iGrid, ht->content[iGrid].num);
+    for (unsigned iEle = 0; iEle < ht->content[iGrid].num; iEle ++) {
+      printf("%03u, ", ht->content[iGrid].content[iEle]);
+    }
+    printf("\n");
+  }
 }
 //-------------------------------------
 void ClearHashTable(HashTable *ht)

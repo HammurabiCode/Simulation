@@ -58,7 +58,8 @@ int main(int argc, char *argv[])
 	povAddLight(&pov1, &light1);
 	povAddInclude(&pov1, "colors");
 
-  unsigned iCurDemon = INIT_GRAN_PILE;
+  unsigned iCurDemon = INIT_GRAN_BOX;
+  //unsigned iCurDemon = INIT_SPHE_BOX;
   //for(iCurDemon = 0; iCurDemon < INIT_FUNC_NUM; iCurDemon ++) 
   {
     (initList[iCurDemon])(&d1);
@@ -75,7 +76,7 @@ int main(int argc, char *argv[])
     system(cmd);
     sprintf(cmd, "rm out/%s/pov/*.pov", filenameList[iCurDemon]);
     system(cmd);
-    for (unsigned iFrame = 0; iFrame < 6000; iFrame ++) {
+    for (unsigned iFrame = 0; iFrame < 1; iFrame ++) {
       //printf("%u\n", iFrame);
       if (iFrame % output_rate == 0) {
         //sprintf(strFileName, "/home/hammurabi/toShare/demon-1/pov/GroundGranular%03u.pov", iFrame/output_rate);
@@ -88,13 +89,16 @@ int main(int argc, char *argv[])
       }
       /*
       */
-      if (iFrame > 3360) {
-        printf("**********************************\n%04u\n", iFrame);
-        for (unsigned ig = 0; ig < d1.num; ig ++) {
-          GranularPrint(d1.sand+ig);
-        }
-      }
       ComputeForce(&d1);
+      /*
+      if (iFrame > 3000) {
+        printf("**********************************\n%04u\n", iFrame);
+        unsigned ig = 26;
+        //for (unsigned ig = 0; ig < d1.num; ig ++) {
+          GranularPrint(d1.sand+ig);
+        //}
+      }
+      */
       TimeIntergration(&d1);
     }
     FreeDemon(&d1);

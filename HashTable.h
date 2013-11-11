@@ -19,17 +19,18 @@
 	^((unsigned long)(((v)[2]-(min_p)[2])/(cell)*P3)))%(ts)
 #define HASH_GRID_INIT_CAPACITY (10)
 #define HASH_GRID_INCR_CAPACITY (10)
+typedef unsigned HashContent;
 //-------------------------------------
 typedef struct  
 {
   unsigned num;
   //unsigned hash_value;
   unsigned capacity;
-  ParticleIndex *content;
+  HashContent *content;
 }HashGrid;
 
 void InitHashGrid(HashGrid *);
-void InsertHashGrid(HashGrid *, ParticleIndex);
+void InsertHashGrid(HashGrid *, HashContent);
 void ClearHashGrid(HashGrid *);
 void FreeHashGrid(HashGrid *);
 
@@ -45,6 +46,7 @@ typedef struct
 //-------------------------------------
 void InitHashTable(HashTable *ht, unsigned ts, const vect min_pos, float cl);
 void InsertHashTable(HashTable *, const Granular *);
+void HashTablePrint(const HashTable*);
 void ClearHashTable(HashTable *);//clear but not free
 void FreeHashTable(HashTable *);//free
 

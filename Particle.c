@@ -142,3 +142,13 @@ void ComputeParticleForce(Particle *ip, Particle *jp) {
 	vectScaleAdd((ip->force), vContactForce, -1);
 	vectScaleAdd((jp->force), vContactForce, 1);
 }
+void ParticlePrint(const Particle * p)
+{
+  print_vect(p->position, "Position:");
+  printf("\t");
+  print_vect(p->velocity, "Velocity:");
+  printf("\t");
+  print_vect(p->force, "Force:");
+  printf("\t");
+  printf("\n");
+}
