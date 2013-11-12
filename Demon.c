@@ -400,7 +400,7 @@ void ComputeForce(Demon *dem_ptr)
               ix*dem_ptr->sand_ht.cell_length,
               iy*dem_ptr->sand_ht.cell_length,
               iz*dem_ptr->sand_ht.cell_length);
-            vectAddTo(nei_grid, iGran->component[ip].position, nei_grid);
+            vectAdd(nei_grid, iGran->component[ip].position);
             unsigned cur_hv = HASH_VALUE(nei_grid,
                 dem_ptr->sand_ht.min_pos,
                 dem_ptr->sand_ht.cell_length,
@@ -411,19 +411,20 @@ void ComputeForce(Demon *dem_ptr)
             }
             if (ih == num_hv) {
               hv[num_hv++] = cur_hv;
-              HashGrid *curHG = &(dem_ptr->sand_ht.content[hv[ih]]);
+              HashGrid *curHG = &(dem_ptr->sand_ht.content[cur_hv]);
               for(unsigned iIndex = 0; iIndex < curHG->num; iIndex ++) {
                 Granular *jGran = dem_ptr->sand + curHG->content[iIndex];
                 if (iGran->index == jGran->index) continue;
                 unsigned iNei = 0;
-                while (listNei[iNei] != curHG->content[iIndex] && iNei < numNei) {
+                while (listNei[iNei] != jGran->index && iNei < numNei) {
                   iNei ++;
                 }
                 if (iNei == numNei) {
                   //compute force between ip & curHG->content[iIndex]
                   //ComputeGranularForce(dem_ptr->sand + ig, dem_ptr->sand + curHG->content[iIndex]);
-                  if (vectGetDistance(iGran->position, jGran->position) < 0.20004 + 0.3*2.0/sqrt(3.0)) {
-                    printf("%03u, ", curHG->content[iIndex]);
+                  //if (vectGetDistance(iGran->position, jGran->position) < 0.20004 + 0.3*2.0/sqrt(3.0)) {
+                  if (vectGetDistance(iGran->position, jGran->position) < iGran->radius*2.0001) {
+                    printf("%03u, ", jGran->index);
                     listNei[numNei++] = curHG->content[iIndex];
                   }
                 }

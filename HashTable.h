@@ -14,9 +14,11 @@
 	^((unsigned long)(((v).z-(min_p).z)/(cell)*P3)))%(ts)
   */
 #define HASH_GRID_INIT_CAPACITY (10)
-#define HASH_VALUE(v, min_p, cell, ts) (((unsigned long)(((v)[0]-(min_p)[0])/(cell)*P1))\
-	^((unsigned long)(((v)[1]-(min_p)[1])/(cell)*P2))\
-	^((unsigned long)(((v)[2]-(min_p)[2])/(cell)*P3)))%(ts)
+#define HASH_VALUE(v, min_p, cell, ts) (\
+    (((unsigned)(((v)[0]-(min_p)[0])/(cell)))*P1)\
+    ^(((unsigned)(((v)[1]-(min_p)[1])/(cell)))*P2)\
+    ^(((unsigned)(((v)[2]-(min_p)[2])/(cell)))*P3)\
+    )%(ts)
 #define HASH_GRID_INIT_CAPACITY (10)
 #define HASH_GRID_INCR_CAPACITY (10)
 typedef unsigned HashContent;
