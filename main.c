@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 	povAddLight(&pov1, &light1);
 	povAddInclude(&pov1, "colors");
 
-  unsigned iCurDemon = INIT_GRAN_BOX;
+  unsigned iCurDemon = INIT_GRAN_2_COLLIDE;
   //unsigned iCurDemon = INIT_SPHE_BOX;
   //for(iCurDemon = 0; iCurDemon < INIT_FUNC_NUM; iCurDemon ++) 
   {
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
     system(cmd);
     sprintf(cmd, "rm out/%s/pov/*.pov", filenameList[iCurDemon]);
     system(cmd);
-    for (unsigned iFrame = 0; iFrame < 1; iFrame ++) {
+    for (unsigned iFrame = 0; iFrame < 6000; iFrame ++) {
       //printf("%u\n", iFrame);
       if (iFrame % output_rate == 0) {
         //sprintf(strFileName, "/home/hammurabi/toShare/demon-1/pov/GroundGranular%03u.pov", iFrame/output_rate);

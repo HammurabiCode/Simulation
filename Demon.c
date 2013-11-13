@@ -134,7 +134,7 @@ void InitDemonGranOneNor(Demon *dem_ptr) {
     //vectSetValue(dem_ptr->sand[ip].velocity, 6.18, 0, 0);
   }
   //--------------------------------
-  //InitDemonHT(dem_ptr);
+  InitDemonHT(dem_ptr);
 }
 //-------------------------------------------------------------------------
 void InitDemonGranPile(Demon *dem_ptr) {
@@ -360,12 +360,12 @@ void InitDemon2Gran(Demon *dem_ptr)
 //-------------------------------------------------------------------------
 void TimeIntergration(Demon *dem_ptr)
 {
-  //ClearHashTable(&(dem_ptr->sand_ht));
+  ClearHashTable(&(dem_ptr->sand_ht));
   vect temp;
   for(unsigned ip = 0; ip < dem_ptr->num; ip ++)
   {
     GranularTimeIntergration(dem_ptr->sand+ip, dem_ptr->time_step);
-    //InsertHashTable(&(dem_ptr->sand_ht), dem_ptr->sand+ip);
+    InsertHashTable(&(dem_ptr->sand_ht), dem_ptr->sand+ip);
   }
 }
 //-------------------------------------------------------------------------
@@ -386,7 +386,7 @@ void ComputeForce(Demon *dem_ptr)
   for(unsigned ig = 0; ig < dem_ptr->num; ig ++) {
     Granular *iGran = dem_ptr->sand + ig;
     unsigned numNei = 0;
-    printf("%03u:", ig);
+    //printf("%03u:", ig);
     for (unsigned ip = 0; ip < iGran->num; ip ++) {
       unsigned num_hv = 0;
       vect nei_grid;
@@ -414,17 +414,18 @@ void ComputeForce(Demon *dem_ptr)
               HashGrid *curHG = &(dem_ptr->sand_ht.content[cur_hv]);
               for(unsigned iIndex = 0; iIndex < curHG->num; iIndex ++) {
                 Granular *jGran = dem_ptr->sand + curHG->content[iIndex];
-                if (iGran->index == jGran->index) continue;
+                if (iGran->index >= jGran->index) continue;
                 unsigned iNei = 0;
                 while (listNei[iNei] != jGran->index && iNei < numNei) {
                   iNei ++;
                 }
                 if (iNei == numNei) {
                   //compute force between ip & curHG->content[iIndex]
-                  //ComputeGranularForce(dem_ptr->sand + ig, dem_ptr->sand + curHG->content[iIndex]);
                   //if (vectGetDistance(iGran->position, jGran->position) < 0.20004 + 0.3*2.0/sqrt(3.0)) {
-                  if (vectGetDistance(iGran->position, jGran->position) < iGran->radius*2.0001) {
-                    printf("%03u, ", jGran->index);
+                  if (vectGetDistance(iGran->position, jGran->position) < iGran->radius + jGran->radius) {
+                    //printf("***************\n");
+                    //printf("%03u, ", jGran->index);
+                    ComputeGranularForce(iGran, jGran);
                     listNei[numNei++] = curHG->content[iIndex];
                   }
                 }
@@ -433,8 +434,9 @@ void ComputeForce(Demon *dem_ptr)
           }
         }
       }
+      GranApplyBound(iGran);
     }
-    printf("\n");
+    //printf("\n");
   }
   free(listNei);
 }
@@ -459,7 +461,7 @@ void SaveDemon(const Demon *dem_ptr, FILE *fp)
 //-------------------------------------------------------------------------
 void FreeDemon(Demon *dem_ptr) {
 	if(dem_ptr == NULL) return;
-	//FreeHashTable(&(dem_ptr->sand_ht));
+	FreeHashTable(&(dem_ptr->sand_ht));
 	for(unsigned is = 0; is < dem_ptr->num; is ++) {
 		FreeGranular(&(dem_ptr->sand[is]));
 	}
