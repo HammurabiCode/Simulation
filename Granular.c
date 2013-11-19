@@ -148,10 +148,13 @@ void GranularTimeIntergration(Granular *iG, float time_step)
   vectSetZero(sumForce);
   for(unsigned ip = 0; ip < iG->num; ip++) {
     vect iAngMom;
-    vectCrossProduct(iAngMom, iG->offset[ip], iG->component[ip].force);
+    vect iOffset;
+    vectSubstractTo(iOffset, iG->component[ip].position, iG->position);
+    vectCrossProduct(iAngMom, iOffset, iG->component[ip].force);
     //print_vect(iG->component[ip].force, "");
     vectAdd(dAngMom, iAngMom);
     vectAdd(sumForce, iG->component[ip].force);
+    vectSetZero(iG->component[ip].force);
   }
   vectCheckZero(dAngMom);
   vectScaleAdd(iG->angularMomentum, dAngMom, time_step);
@@ -172,13 +175,24 @@ void GranularTimeIntergration(Granular *iG, float time_step)
 	vectScaleAdd(iG->velocity, iG->acceleration, time_step);
 	vectScaleAdd(iG->position, iG->velocity, time_step);
   for (unsigned ip = 0; ip < iG->num; ip++) {
+    vect iOffset;
+
+    //1----
+    /*
+    matMulVect(iOffset, matRot, iG->offset[ip]);
+    vectAddTo(iG->component[ip].position, iG->position, iOffset);
+
     vectCopy(iG->component[ip].velocity, iG->velocity);
-    //vectCheckZero(iG->angularVelocity);
     vectAddCrossProduct(iG->component[ip].velocity,
-        iG->angularVelocity, iG->offset[ip]);
+        iG->angularVelocity, iOffset);
+    */
+    //2----
+    vectCopy(iOffset, iG->offset[ip]);
+    vectCopy(iG->component[ip].velocity, iG->velocity);
+    vectAddCrossProduct(iG->component[ip].velocity,
+        iG->angularVelocity, iOffset);
     UpdateParticlePosition(iG->component+ip, time_step);
     vectSubstractTo(iG->offset[ip], iG->component[ip].position, iG->position);
-    vectSetZero(iG->component[ip].force);
   }
   /*
   float dd = fabs(iG->offset[2][0]) - fabs(iG->offset[1][0]);

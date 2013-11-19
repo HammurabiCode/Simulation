@@ -48,9 +48,9 @@ void InitDemonSphereBox(Demon *dem_ptr) {
 }
 //-------------------------------------------------------------------------
 void InitDemonGranularBox(Demon *dem_ptr) {
-  unsigned xNum = 10;
-  unsigned yNum = 10;
-  unsigned zNum = 10;
+  unsigned xNum = 4;
+  unsigned yNum = 4;
+  unsigned zNum = 4;
   dem_ptr->time_step  = 0.001f;
   dem_ptr->num        = xNum*yNum*zNum;
   dem_ptr->sand       = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);

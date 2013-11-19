@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
 	povAddInclude(&pov1, "colors");
 
   unsigned iCurDemon = INIT_GRAN_2_COLLIDE;
+  //unsigned iCurDemon = INIT_GRAN_ONE_NOR;
   //unsigned iCurDemon = INIT_SPHE_BOX;
   //for(iCurDemon = 0; iCurDemon < INIT_FUNC_NUM; iCurDemon ++) 
   {
