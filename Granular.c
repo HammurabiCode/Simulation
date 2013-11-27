@@ -4,14 +4,11 @@
 #include "quat.h"
 #include "common.h"
 
-//----------------------------------------------------------------
-void InitGranularBox(unsigned index, Granular *gran, const vect pos,
-    float bigR, float smallR, float density)
+void InitGranularTetrahedron(unsigned index, Granular *gran, const vect pos,
+		float r, float density)
 {
 	gran->index = index;
 	gran->density = density;
-	gran->mass = PI*4.0*(bigR*bigR*bigR + smallR*smallR*smallR*8)/3.0;
-	gran->radius = bigR + 2*smallR;
   //--------------------------------
   //quatenion inertia
   vectCopy((gran->position), pos);
@@ -19,11 +16,161 @@ void InitGranularBox(unsigned index, Granular *gran, const vect pos,
   vectSetZero((gran->acceleration));
   vectSetZero((gran->angularVelocity));
   vectSetZero((gran->angularMomentum));
+	setQuatZero(&(gran->quaternion));
+	gran->quaternion[0] = 1.0f;
+  FreeGranular(gran);
 
+  //--------------------------------
+  gran->num = 4;
+	gran->mass = PI*r*r*r*4.0/3.0*gran->num;
+  gran->component = (Particle*)malloc(sizeof(Particle)*gran->num);
+  gran->offset = (vect*)malloc(sizeof(vect)*gran->num);
+  ParticleIndex ip = 0;
+  {
+    vectSetValue(pos,
+        -1, 1.0f/sqrt(3.0), -1.0/sqrt(6.0));
+    vectScale(pos, r);
+    vectCopy(gran->offset[ip], pos);
+    vectAddTo(pos, gran->position, gran->offset[ip]);
+    InitParticle(gran->component+ip, pos, r);
+    ip++;
+  }
+  {
+    vectSetValue(pos,
+        1, 1.0f/sqrt(3.0), -1.0/sqrt(6.0));
+    vectScale(pos, r);
+    vectCopy(gran->offset[ip], pos);
+    vectAddTo(pos, gran->position, gran->offset[ip]);
+    InitParticle(gran->component+ip, pos, r);
+    ip++;
+  }
+  {
+    vectSetValue(pos,
+        0.0f, -2.0f/sqrt(3.0), -1.0/sqrt(6.0));
+    vectScale(pos, r);
+    vectCopy(gran->offset[ip], pos);
+    vectAddTo(pos, gran->position, gran->offset[ip]);
+    InitParticle(gran->component+ip, pos, r);
+    ip++;
+  }
+  {
+    vectSetValue(pos,
+        0.0f, 0.0f, 3.0/sqrt(6.0));
+    vectScale(pos, r);
+    vectCopy(gran->offset[ip], pos);
+    vectAddTo(pos, gran->position, gran->offset[ip]);
+    InitParticle(gran->component+ip, pos, r);
+    ip++;
+  }
+	InitGranularInertia(gran);
+}
+void InitGranularCube(unsigned index, Granular *gran, const vect pos,
+		float r, float density, unsigned xNum, unsigned yNum, unsigned zNum)
+{
+  if (xNum < 2 || yNum < 2 || zNum < 2) return;
+	gran->index = index;
+	gran->density = density;
+  //--------------------------------
+  //quatenion inertia
+  vectCopy((gran->position), pos);
+  vectSetZero((gran->velocity));
+  vectSetZero((gran->acceleration));
+  vectSetZero((gran->angularVelocity));
+  vectSetZero((gran->angularMomentum));
+	setQuatZero(&(gran->quaternion));
+	gran->quaternion[0] = 1.0f;
+  FreeGranular(gran);
+
+  //--------------------------------
+  gran->num = (xNum*yNum + (yNum + xNum - 2)*(zNum-2))*2;
+	gran->mass = PI*r*r*r*4.0/3.0*xNum*yNum*zNum;
+  gran->component = (Particle*)malloc(sizeof(Particle)*gran->num);
+  gran->offset = (vect*)malloc(sizeof(vect)*gran->num);
+  ParticleIndex ip = 0;
+  /*
+  */
+  vect vectPartPos;
+  vectSetValue(vectPartPos,
+      1 - (int)(xNum), 1 - (int)(yNum), 1 - (int)(zNum));
+  vectScale(vectPartPos, r);
+  for (unsigned i = 0; i < xNum*yNum; i++) {
+    vectCopy(gran->offset[ip], vectPartPos);
+    gran->offset[ip][0] += (i%xNum)*2*r;
+    gran->offset[ip][1] += (i/xNum)*2*r;
+    vectAddTo(pos, gran->position, gran->offset[ip]);
+    InitParticle(gran->component+ip, pos, r);
+    ip++;
+  }
+  vectPartPos[2] = ((int)(zNum) - 1)*r;
+  for (unsigned i = 0; i < xNum*yNum; i++) {
+    vectCopy(gran->offset[ip], vectPartPos);
+    gran->offset[ip][0] += (i%xNum)*2*r;
+    gran->offset[ip][1] += (i/xNum)*2*r;
+    vectAddTo(pos, gran->position, gran->offset[ip]);
+    InitParticle(gran->component+ip, pos, r);
+    ip++;
+  }
+  vectSetValue(vectPartPos,
+      1 - (int)(xNum), 1 - (int)(yNum), 3 - (int)(zNum));
+  vectScale(vectPartPos, r);
+  for (unsigned i = 0; i < yNum*(zNum-2); i++) {
+    vectCopy(gran->offset[ip], vectPartPos);
+    gran->offset[ip][1] += (i%yNum)*2*r;
+    gran->offset[ip][2] += (i/yNum)*2*r;
+    vectAddTo(pos, gran->position, gran->offset[ip]);
+    InitParticle(gran->component+ip, pos, r);
+    ip++;
+  }
+  vectPartPos[0] = ((int)(xNum) - 1)*r;
+  for (unsigned i = 0; i < yNum*(zNum-2); i++) {
+    vectCopy(gran->offset[ip], vectPartPos);
+    gran->offset[ip][1] += (i%yNum)*2*r;
+    gran->offset[ip][2] += (i/yNum)*2*r;
+    vectAddTo(pos, gran->position, gran->offset[ip]);
+    InitParticle(gran->component+ip, pos, r);
+    ip++;
+  }
+  vectSetValue(vectPartPos,
+      3 - (int)(xNum), 1 - (int)(yNum), 3 - (int)(zNum));
+  vectScale(vectPartPos, r);
+  for (unsigned i = 0; i < (xNum-2)*(zNum-2); i++) {
+    vectCopy(gran->offset[ip], vectPartPos);
+    gran->offset[ip][0] += (i%(xNum-2))*2*r;
+    gran->offset[ip][2] += (i/(xNum-2))*2*r;
+    vectAddTo(pos, gran->position, gran->offset[ip]);
+    InitParticle(gran->component+ip, pos, r);
+    ip++;
+  }
+  vectPartPos[1] = ((int)(yNum) - 1)*r;
+  for (unsigned i = 0; i < (xNum-2)*(zNum-2); i++) {
+    vectCopy(gran->offset[ip], vectPartPos);
+    gran->offset[ip][0] += (i%(xNum-2))*2*r;
+    gran->offset[ip][2] += (i/(xNum-2))*2*r;
+    vectAddTo(pos, gran->position, gran->offset[ip]);
+    InitParticle(gran->component+ip, pos, r);
+    ip++;
+  }
+  //--------------------------------
+	InitGranularInertia(gran);
+}
+//----------------------------------------------------------------
+void InitGranularBox(unsigned index, Granular *gran, const vect pos,
+    float bigR, float smallR, float density)
+{
+	gran->index = index;
+	gran->density = density;
+  //--------------------------------
+  //quatenion inertia
+  vectCopy((gran->position), pos);
+  vectSetZero((gran->velocity));
+  vectSetZero((gran->acceleration));
+  vectSetZero((gran->angularVelocity));
+  vectSetZero((gran->angularMomentum));
   //--------------------------------
   FreeGranular(gran);
 
   gran->num = 9;
+	gran->mass = PI*4.0*(bigR*bigR*bigR + smallR*smallR*smallR*8)/3.0;
   gran->component = (Particle*)malloc(sizeof(Particle)*gran->num);
   gran->offset = (vect*)malloc(sizeof(vect)*gran->num);
   InitParticle(gran->component, pos, bigR);
@@ -56,7 +203,6 @@ void InitGranularSphere(unsigned index, Granular *gran, const vect pos,
 	gran->index = index;
 	gran->mass = density*PI*4.0*radius*radius*radius/3.0;
 	gran->density	= density;
-	gran->radius = radius;
 
 	vectCopy(gran->position, pos);
 	vectSetZero(gran->velocity);
@@ -126,13 +272,13 @@ void GranApplyBound(Granular *iG)
     PartApplyBound(iG->component+ip);
 	}
 }
-void GranularTimeIntergration(Granular *iG, float time_step)
+void GranularTimeIntergration(Granular *iG, float time_step, const vect g)
 {
 	if (iG->mass <= 0.0f) return;
   if (iG->num == 1) {
     vectScaleTo(iG->acceleration, iG->component[0].force, 1.0/iG->mass);
 #ifndef ZERO_GRAVITY
-    vectAdd(iG->acceleration, GRAVITY);
+    vectAdd(iG->acceleration, g);
 #endif
     vectScaleAdd(iG->velocity, iG->acceleration, time_step);
     vectScaleAdd(iG->position, iG->velocity, time_step);
@@ -164,35 +310,39 @@ void GranularTimeIntergration(Granular *iG, float time_step)
   mat3x3 matRot, matRotTran;
   matFromQuat(matRot, iG->quaternion);
   matTranspose(matRotTran, matRot);
-  mat3x3 matTemp;
-  matMulMat(matTemp, matRot, iG->inertiaInv);
-  matMulMat(iG->inertiaInv, matTemp, matRotTran);
-  matMulVect(iG->angularVelocity, iG->inertiaInv, iG->angularMomentum);
+  mat3x3 matTemp0, matTemp1;
+  matMulMat(matTemp0, matRot, iG->inertiaInv);
+  matMulMat(matTemp1, matTemp0, matRotTran);
+  matMulVect(iG->angularVelocity, matTemp1, iG->angularMomentum);
 	vectScaleTo(iG->acceleration, sumForce, 1.0/iG->mass);
 #ifndef ZERO_GRAVITY
-	vectAdd(iG->acceleration, GRAVITY);
+	vectAdd(iG->acceleration, g);
 #endif
 	vectScaleAdd(iG->velocity, iG->acceleration, time_step);
 	vectScaleAdd(iG->position, iG->velocity, time_step);
+  float fLen = vectGetLength(iG->velocity);
+  if (fLen > MAX_VELOCITY) {
+    vectScale(iG->velocity, MAX_VELOCITY/fLen);
+  }
   for (unsigned ip = 0; ip < iG->num; ip++) {
     vect iOffset;
 
     //1----
-    /*
     matMulVect(iOffset, matRot, iG->offset[ip]);
     vectAddTo(iG->component[ip].position, iG->position, iOffset);
 
     vectCopy(iG->component[ip].velocity, iG->velocity);
     vectAddCrossProduct(iG->component[ip].velocity,
         iG->angularVelocity, iOffset);
-    */
     //2----
+    /*
     vectCopy(iOffset, iG->offset[ip]);
     vectCopy(iG->component[ip].velocity, iG->velocity);
     vectAddCrossProduct(iG->component[ip].velocity,
         iG->angularVelocity, iOffset);
     UpdateParticlePosition(iG->component+ip, time_step);
     vectSubstractTo(iG->offset[ip], iG->component[ip].position, iG->position);
+    */
   }
   /*
   float dd = fabs(iG->offset[2][0]) - fabs(iG->offset[1][0]);

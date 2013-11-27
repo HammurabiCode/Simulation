@@ -5,7 +5,6 @@
 
 typedef float real;
 typedef float vect[3];
-const static vect GRAVITY = {0, 0, -9.8};
 //-------------------------------------------------------------------------
 static inline void vectSetZero(vect v)
 {
@@ -93,7 +92,7 @@ static inline float vectGetDistance(const vect v1, const vect v2)
   return vectGetLength(t);
 }
 //-------------------------------------------------------------------------
-static inline float vectGetDist(const vect a, const b)
+static inline float vectGetDist(const vect a, const vect b)
 {
   vect vDist;
   vectSubstractTo(vDist, a, b);
@@ -109,7 +108,7 @@ static inline float vectNormalize(vect a)
   return len;
 }
 //-------------------------------------------------------------------------
-static inline vectCheckZero(vect v)
+static inline void vectCheckZero(vect v)
 {
   for(int i = 0; i < 3; i ++) {
     if (fabs(v[i]) < ZERO)

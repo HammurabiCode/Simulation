@@ -16,7 +16,6 @@ typedef struct
 	//ParticleIndex iStart;
   float mass;
   float density;
-  float radius;
 
   unsigned num; //num of particle
   Particle *component; //list of particle
@@ -35,13 +34,15 @@ typedef struct
 //-------------------------------------
 void InitGranularBox(unsigned index, Granular *gran, const vect pos,
 		float bigR, float smallR, float density);
+void InitGranularCube(unsigned index, Granular *gran, const vect pos,
+		float r, float density, unsigned xNum, unsigned yNum, unsigned zNum);
 void InitGranularHPlane(unsigned index, Granular *gran, const vect min_pos,
 		unsigned l, unsigned w, float radius, float density);
 void InitGranularSphere(unsigned index, Granular *gran, const vect pos,
     float radius, float density);
 void ComputeGranularForce(Granular *iG, Granular *jG);
 void GranApplyBound(Granular *iG);
-void GranularTimeIntergration(Granular *, float time_step);
+void GranularTimeIntergration(Granular *, float time_step, const vect g);
 void InitGranularInertia(Granular *);
 void GranularPrint(const Granular *gran);
 void FreeGranular(Granular *);

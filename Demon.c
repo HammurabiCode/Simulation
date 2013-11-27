@@ -4,6 +4,8 @@
 #include "HashTable.h"
 #include "Granular.h"
 
+const static vect GRAVITY = {0, 0, -9.8};
+
 void InitDemonHT(Demon *dem_ptr)
 {
   dem_ptr->sand_ht.content = NULL;
@@ -23,7 +25,7 @@ void InitDemonSphereBox(Demon *dem_ptr) {
   unsigned xNum = 10;
   unsigned yNum = 10;
   unsigned zNum = 10;
-  dem_ptr->time_step  = 0.001f;
+  dem_ptr->time_step  = 0.00001f;
   dem_ptr->num        = xNum*yNum*zNum;
   dem_ptr->sand       = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
   vect pos;
@@ -51,30 +53,28 @@ void InitDemonGranularBox(Demon *dem_ptr) {
   unsigned xNum = 4;
   unsigned yNum = 4;
   unsigned zNum = 4;
-  dem_ptr->time_step  = 0.001f;
-  dem_ptr->num        = xNum*yNum*zNum;
-  dem_ptr->sand       = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
-  vect pos;
-  vectSetZero(pos);
   float smallRadius   = 0.1f;
   float bigRadius     = 0.2f;
-  float granDensity   = 2.0f;
-  dem_ptr->max_radius = 2*smallRadius + bigRadius;
+  float granDensity   = 10.0f;
   float dist          = ((smallRadius + bigRadius)/sqrt(3.0)+smallRadius)*2;
-  GranularIndex ip    = 0;
-  vect origin;
-  vectSetValue(origin, dem_ptr->max_radius, dem_ptr->max_radius, dem_ptr->max_radius);
-  vectSetValue(dem_ptr->vDisplayOffset, -dist/2*xNum, 0, 0);
-  for(unsigned ix = 0; ix < xNum; ix ++)
-    for(unsigned iy = 0; iy < yNum; iy ++)
-      for(unsigned iz = 0; iz < zNum; iz ++) {
-        vectSetValue(pos,
-            origin[0] + ix*dist,
-            origin[1] + iy*dist,
-            origin[2] + iz*dist);
-        InitGranularBox(ip, dem_ptr->sand + ip, pos, bigRadius, smallRadius, granDensity);
-				ip ++;
-      }
+
+  dem_ptr->time_step  = 0.00001f;
+  dem_ptr->num        = xNum*yNum*zNum;
+  dem_ptr->sand       = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
+  dem_ptr->max_radius = 2*smallRadius + bigRadius;
+  vectCopy(dem_ptr->vGravity, GRAVITY);
+  vectSetValue(dem_ptr->vDisplayOffset, -dist/2.0f*xNum, 0, 0);
+  
+  vect vMinPos;
+  vectSetValue(vMinPos, dist/2.0f, dist/2.0f, dist/2.0f);
+  //--------------------------------
+  for (unsigned ip = 0; ip < dem_ptr->num; ip ++) {
+    vect vOffset;
+    vectSetValue(vOffset, ((int)(ip%xNum)), ip/xNum%yNum, ip/(xNum*yNum) + 2);
+    vectScale(vOffset, dist);
+    vectAdd(vOffset, vMinPos);
+    InitGranularBox(ip, dem_ptr->sand+ip, vOffset, bigRadius, smallRadius, granDensity); 
+  }
   InitDemonHT(dem_ptr);
 }
 //-------------------------------------------------------------------------
@@ -82,43 +82,46 @@ void InitDemonGranOneShear(Demon *dem_ptr) {
   unsigned xNum = 1;
   unsigned yNum = 1;
   unsigned zNum = 1;
-  dem_ptr->time_step = 0.001f;
+  dem_ptr->time_step = 0.0001f;
   dem_ptr->num = xNum*yNum*zNum;
   dem_ptr->sand = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
   
-  vect pos;
-  vectSetZero(pos);
   float boxBigR = 0.4f;
-  float boxSmallR = 0.2f;
-  float granDensity= 2.0f;
+  float boxSmallR = 0.15f;
+  float granDensity= 10.0f;
   float granEdge = ((boxBigR + boxSmallR)/sqrt(3.0)+boxSmallR);
+
+  vectCopy(dem_ptr->vGravity, GRAVITY);
+
   vectSetValue(dem_ptr->vDisplayOffset, -granEdge*(xNum*2), 0, 0);
   vect vMinPos;
   vectSetValue(vMinPos, granEdge, granEdge, granEdge);
   //--------------------------------
   for (unsigned ip = 0; ip < dem_ptr->num; ip ++) {
     vect vOffset;
-    vectSetValue(vOffset, ((int)(ip%xNum))-3, ip/xNum%yNum, ip/(xNum*yNum) + 0);
+    vectSetValue(vOffset, ((int)(ip%xNum)) + 6, ip/xNum%yNum, ip/(xNum*yNum));
     vectScale(vOffset, granEdge*2);
     vectAdd(vOffset, vMinPos);
     InitGranularBox(ip, dem_ptr->sand+ip, vOffset, boxBigR, boxSmallR, granDensity); 
-    vectSetValue(dem_ptr->sand[ip].velocity, 3.18, 0, 0);
+    vectSetValue(dem_ptr->sand[ip].velocity, -10.0, 0, 0);
   }
   //--------------------------------
-  //InitDemonHT(dem_ptr);
+  InitDemonHT(dem_ptr);
 }
+
+//-------------------------------------------------------------------------
 void InitDemonGranOneNor(Demon *dem_ptr) {
   unsigned xNum = 1;
   unsigned yNum = 1;
   unsigned zNum = 1;
-  dem_ptr->time_step = 0.001f;
+  dem_ptr->time_step = 0.0001f;
   dem_ptr->num = xNum*yNum*zNum;
   dem_ptr->sand = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
   
-  vect pos;
-  vectSetZero(pos);
+  vectCopy(dem_ptr->vGravity, GRAVITY);
+
   float boxBigR = 0.4f;
-  float boxSmallR = 0.2f;
+  float boxSmallR = 0.15f;
   float granDensity= 10.0f;
   float granEdge = ((boxBigR + boxSmallR)/sqrt(3.0)+boxSmallR);
   vectSetValue(dem_ptr->vDisplayOffset, -granEdge*(xNum*2), 0, 0);
@@ -138,56 +141,46 @@ void InitDemonGranOneNor(Demon *dem_ptr) {
 }
 //-------------------------------------------------------------------------
 void InitDemonGranPile(Demon *dem_ptr) {
-  unsigned xNum = 4;
-  unsigned yNum = 4;
-  unsigned zNum = 4;
-  dem_ptr->time_step = 0.0001f;
-  dem_ptr->num = xNum*yNum*zNum + 0;
-  dem_ptr->sand = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
+  unsigned xNum = 10;
+  unsigned yNum = 10;
+  unsigned zNum = 10;
+  float smallRadius   = 0.05f;
+  float bigRadius     = 0.2f;
+  float granDensity   = 5.0f;
+  float dist          = ((smallRadius + bigRadius)/sqrt(3.0)+smallRadius)*2;
+
+  dem_ptr->time_step  = 0.00001f;
+  dem_ptr->num        = xNum*yNum*zNum;
+  dem_ptr->sand       = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
+  dem_ptr->max_radius = bigRadius;
+  vectCopy(dem_ptr->vGravity, GRAVITY);
+  vectSetValue(dem_ptr->vDisplayOffset, -dist/2.0f*xNum, 0, 0);
   
-  vect pos;
-  vectSetZero(pos);
-  float boxBigR = 0.4f;
-  float boxSmallR = 0.2f;
-  float granDensity= 2.0f;
-  float granEdge = ((boxBigR + boxSmallR)/sqrt(3.0)+boxSmallR);
-  vectSetValue(dem_ptr->vDisplayOffset, -granEdge*(xNum*2), 0, 0);
   vect vMinPos;
-  vectSetValue(vMinPos, granEdge, granEdge, granEdge*2);
+  vectSetValue(vMinPos, dist/2.0f, dist/2.0f, dist/2.0f);
   //--------------------------------
-  unsigned ip = 0;
-  for (; ip < dem_ptr->num - 0; ip ++) {
+  for (unsigned ip = 0; ip < dem_ptr->num; ip ++) {
     vect vOffset;
-    vectSetValue(vOffset, ((int)(ip%xNum)), ip/xNum%yNum, ip/(xNum*yNum));
-    vectScale(vOffset, granEdge*2);
+    vectSetValue(vOffset, ((int)(ip%xNum)), ip/xNum%yNum, ip/(xNum*yNum) + 2);
+    vectScale(vOffset, dist);
     vectAdd(vOffset, vMinPos);
-    InitGranularBox(ip, dem_ptr->sand+ip, vOffset, boxBigR, boxSmallR, granDensity); 
-    //vectSetValue(dem_ptr->sand[ip].velocity, 6.18, 0, 0);
+    InitGranularBox(ip, dem_ptr->sand+ip, vOffset, bigRadius, smallRadius, granDensity); 
   }
-  //--------------------------------
-  /*
-  vect vOffset;
-  vectSetValue(vOffset, 1.5, 1.5, 3);
-  vectScale(vOffset, granEdge*2);
-  vectAdd(vOffset, vMinPos);
-  InitGranularBox(ip, dem_ptr->sand+ip, vOffset, boxBigR, boxSmallR, granDensity); 
-  ip ++;
-  */
-  //--------------------------------
-  //InitDemonHT(dem_ptr);
+  InitDemonHT(dem_ptr);
 }
 //-------------------------------------------------------------------------
 void InitDemonGran2Collide(Demon *dem_ptr) {
-  dem_ptr->time_step = 0.001f;
-  dem_ptr->num = 2;
-  dem_ptr->sand = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
-  
   float boxBigR = 0.4f;
   float boxSmallR = 0.2f;
-  dem_ptr->max_radius = boxBigR;
   float granDensity= 2.0f;
   float granEdge = ((boxBigR + boxSmallR)/sqrt(3.0)+boxSmallR);
+
+  dem_ptr->time_step = 0.0001f;
+  dem_ptr->max_radius = boxBigR;
+  dem_ptr->num = 2;
+  dem_ptr->sand = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
   vectSetZero(dem_ptr->vDisplayOffset);
+  vectSetZero(dem_ptr->vGravity);
   //--------------------------------
   unsigned ip = 0;
   vect pos;
@@ -199,7 +192,7 @@ void InitDemonGran2Collide(Demon *dem_ptr) {
     ip++;
   }
   {
-    vectSetValue(pos, 1.0f, 0.0f, 2.2f);
+    vectSetValue(pos, 1.0f, 0.0f, 2.0f);
     InitGranularBox(ip, dem_ptr->sand+ip, pos, boxBigR, boxSmallR, granDensity); 
     vectSetValue(dem_ptr->sand[ip].velocity, -3.14, 0, 0);
     ip++;
@@ -311,50 +304,64 @@ void InitDemonThrow(Demon *dem_ptr)
 //-------------------------------------------------------------------------
 void InitDemonFall(Demon *dem_ptr)
 {
-  dem_ptr->time_step = 0.001f;
-  dem_ptr->num = 2;
-  dem_ptr->sand = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
-  //--------------------------------
-  vect pos;
-  vectSetZero(pos);
-  float radius = 0.2f;
-  float granDensity= 2.0f;
-  dem_ptr->max_radius= radius;
+  unsigned xNum = 4;
+  unsigned yNum = 4;
+  unsigned zNum = 4;
+  float smallRadius   = 0.06f;
+  float bigRadius     = 0.2f;
+  float granDensity   = 10.0f;
+  float dist          = ((smallRadius + bigRadius)/sqrt(3.0)+smallRadius)*2;
+
+  dem_ptr->time_step  = 0.0001f;
+  dem_ptr->num        = xNum*yNum*zNum + 1;
+  dem_ptr->sand       = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
+  dem_ptr->max_radius = 2*smallRadius + bigRadius;
+  vectCopy(dem_ptr->vGravity, GRAVITY);
+  vectSetValue(dem_ptr->vDisplayOffset, -dist/2.0f*xNum, 0, 0);
+  
+  vect vMinPos;
+  vectSetValue(vMinPos, dist/2.0f, dist/2.0f, 3.0f);
   //--------------------------------
   unsigned ip = 0;
+  for (; ip < xNum*yNum*zNum; ip ++) {
+    vect vOffset;
+    vectSetValue(vOffset, ((int)(ip%xNum)), ip/xNum%yNum, ip/(xNum*yNum) + 2);
+    vectScale(vOffset, dist);
+    vectAdd(vOffset, vMinPos);
+    InitGranularBox(ip, dem_ptr->sand+ip, vOffset, bigRadius, smallRadius, granDensity); 
+  }
+  vectSetValue(vMinPos, bigRadius*2.0f, bigRadius*2.0f, 1.0f);
+  InitGranularCube(ip, dem_ptr->sand+ip, vMinPos, bigRadius, granDensity,
+      xNum, yNum, zNum); 
+  ip++;
   //--------------------------------
-	vectSetValue(pos,	radius*2, radius*2,	radius*10.0f);
-	//vectSetValue(pos,	0, 0,	2.0f);
-	//InitGranularBox(ip, dem_ptr->sand+ip, pos, boxBigR, radius, granDensity); 
-	InitGranularSphere(ip, dem_ptr->sand+ip, pos, radius, granDensity); 
-	ip++;
-  //--------------------------------
-	vectSetValue(pos, 0, -radius*5, 0);
-	InitGranularHPlane(ip, dem_ptr->sand+ip, pos, 100, 10, radius, granDensity);
-  //--------------------------------
-  //InitDemonHT(dem_ptr);
+  InitDemonHT(dem_ptr);
 }
 //-------------------------------------------------------------------------
-void InitDemon2Gran(Demon *dem_ptr)
+void InitDemonCube(Demon *dem_ptr)
 {
-  dem_ptr->time_step = 0.001f;
-  dem_ptr->num = 2;
-  dem_ptr->sand = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
-  vect pos;
-  vectSetZero(pos);
-  float boxBigR = 0.4f;
-  float boxSmallR = 0.2f;
-  float granDensity= 2.0f;
-  //dem_ptr->max_radius= boxBigR + boxSmallR*2;
-  dem_ptr->max_radius= ((boxBigR + boxSmallR)/sqrt(3.0)+boxSmallR);
-  for(unsigned ip = 0; ip < dem_ptr->num; ip ++)
-  {
-    vectSetValue(pos,
-        1.0f,
-        (ip+1)*dem_ptr->max_radius*2,
-        1.0f);
-    InitGranularBox(ip, dem_ptr->sand+ip, pos, boxBigR, boxSmallR, granDensity); 
-  }
+  unsigned xNum = 4;
+  unsigned yNum = 4;
+  unsigned zNum = 4;
+  float radius  = 0.2f;
+  float granDensity   = 10.0f;
+
+  dem_ptr->time_step  = 0.00001f;
+  dem_ptr->num        = 1;
+  dem_ptr->sand       = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
+  dem_ptr->max_radius = radius;
+  vectCopy(dem_ptr->vGravity, GRAVITY);
+  vectSetValue(dem_ptr->vDisplayOffset, 0.0f, 0, 0);
+  
+  vect vMinPos;
+  vectSetValue(vMinPos, 2.0f, 2.0f, 2.0f);
+  //--------------------------------
+  unsigned ip = 0;
+  InitGranularCube(ip, dem_ptr->sand+ip, vMinPos, radius, granDensity,
+      xNum, yNum, zNum); 
+  ip++;
+  
+  //--------------------------------
   InitDemonHT(dem_ptr);
 }
 //-------------------------------------------------------------------------
@@ -364,30 +371,21 @@ void TimeIntergration(Demon *dem_ptr)
   vect temp;
   for(unsigned ip = 0; ip < dem_ptr->num; ip ++)
   {
-    GranularTimeIntergration(dem_ptr->sand+ip, dem_ptr->time_step);
+    GranularTimeIntergration(dem_ptr->sand+ip, dem_ptr->time_step, dem_ptr->vGravity);
     InsertHashTable(&(dem_ptr->sand_ht), dem_ptr->sand+ip);
   }
 }
 //-------------------------------------------------------------------------
 void ComputeForce(Demon *dem_ptr)
 {
-  /// For denmon 'gran pull'.
-	/*
-  for(unsigned ig = 0; ig < dem_ptr->num; ig++) {
-    for(unsigned jg = ig+1; jg < dem_ptr->num; jg++) {
-      ComputeGranularForce(dem_ptr->sand + ig, dem_ptr->sand + jg);
-    }
-    GranApplyBound(dem_ptr->sand+ig);
-  }
-	*/
-  const static unsigned MAX_NEI_NUM = 1000;
+  const static unsigned MAX_NEI_NUM = 100;
   GranularIndex *listNei = (GranularIndex*)malloc(sizeof(GranularIndex)*MAX_NEI_NUM);
   unsigned hv[27];
   for(unsigned ig = 0; ig < dem_ptr->num; ig ++) {
     Granular *iGran = dem_ptr->sand + ig;
     unsigned numNei = 0;
-    //printf("%03u:", ig);
     for (unsigned ip = 0; ip < iGran->num; ip ++) {
+      Particle* iPart = iGran->component + ip;
       unsigned num_hv = 0;
       vect nei_grid;
       for(int ix = -1; ix <= 1; ix ++)
@@ -413,22 +411,10 @@ void ComputeForce(Demon *dem_ptr)
               hv[num_hv++] = cur_hv;
               HashGrid *curHG = &(dem_ptr->sand_ht.content[cur_hv]);
               for(unsigned iIndex = 0; iIndex < curHG->num; iIndex ++) {
-                Granular *jGran = dem_ptr->sand + curHG->content[iIndex];
+                Granular *jGran = dem_ptr->sand + curHG->content[iIndex].iGran;
                 if (iGran->index >= jGran->index) continue;
-                unsigned iNei = 0;
-                while (listNei[iNei] != jGran->index && iNei < numNei) {
-                  iNei ++;
-                }
-                if (iNei == numNei) {
-                  //compute force between ip & curHG->content[iIndex]
-                  //if (vectGetDistance(iGran->position, jGran->position) < 0.20004 + 0.3*2.0/sqrt(3.0)) {
-                  if (vectGetDistance(iGran->position, jGran->position) < iGran->radius + jGran->radius) {
-                    //printf("***************\n");
-                    //printf("%03u, ", jGran->index);
-                    ComputeGranularForce(iGran, jGran);
-                    listNei[numNei++] = curHG->content[iIndex];
-                  }
-                }
+                Particle* jPart = jGran->component + curHG->content[iIndex].iPart;
+                ComputeParticleForce(iPart, jPart);
               }
             }
           }
@@ -436,7 +422,6 @@ void ComputeForce(Demon *dem_ptr)
       }
       GranApplyBound(iGran);
     }
-    //printf("\n");
   }
   free(listNei);
 }

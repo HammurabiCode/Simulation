@@ -122,7 +122,7 @@ matInv(mat3x3 dst, const mat3x3 src)
 	hls += src[0][0]*dst[0][0];
 	hls += src[0][1]*dst[1][0];
 	hls += src[0][2]*dst[2][0];
-  if(abs(hls) < ZERO) {
+  if(fabs(hls) < ZERO) {
     //matCopy(dst, src);
     matSetZero(dst);
     return 0;

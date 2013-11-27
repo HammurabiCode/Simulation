@@ -57,10 +57,13 @@ void InitHashTable(HashTable *ht, unsigned ts, const vect min_p, float cl)
 //-------------------------------------
 void InsertHashTable(HashTable *ht, const Granular *g)
 {
+  HashContent hc;
   for (ParticleIndex ip = 0; ip < g->num; ip ++) {
     unsigned hv = HASH_VALUE(g->component[ip].position,
         ht->min_pos, ht->cell_length, ht->table_size);
-    InsertHashGrid(ht->content+hv, g->index);
+    hc.iGran = g->index;
+    hc.iPart = ip;
+    InsertHashGrid(ht->content+hv, hc);
   }
 }
 //-------------------------------------

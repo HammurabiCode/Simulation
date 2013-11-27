@@ -5,18 +5,6 @@
 #include "Particle.h"
 #include "Demon.h"
 #include "pov.h"
-/*
-float GetKr(const Particle *p1, const Particle *p2)
-{
-  float result = 0.0f;
-  result = sqrt(1.0/p1->radius + 1.0/p2->radius);
-  result *= (1-p1->poission*p1->poission)/p1->young
-    + (1-p2->poission*p2->poission)/p2->young;
-  return 0.75f/ result;
-}
-*/
-
-const static unsigned PART_NUM = 2;
 
 int main(int argc, char *argv[])
 {
@@ -58,9 +46,15 @@ int main(int argc, char *argv[])
 	povAddLight(&pov1, &light1);
 	povAddInclude(&pov1, "colors");
 
-  unsigned iCurDemon = INIT_GRAN_2_COLLIDE;
-  //unsigned iCurDemon = INIT_GRAN_ONE_NOR;
+  unsigned iCurDemon = INIT_CUBE_BOX;
+  //unsigned iCurDemon = INIT_CUBE;
+  //unsigned iCurDemon = INIT_GRAN_2_COLLIDE;
+  //unsigned iCurDemon = INIT_GRAN_BOX;
+  //unsigned iCurDemon = INIT_GRAN_PILE;
   //unsigned iCurDemon = INIT_SPHE_BOX;
+  //unsigned iCurDemon = INIT_GRAN_ONE_NOR;
+  //unsigned iCurDemon = INIT_GRAN_ONE_SHEAR;
+  //unsigned iCurDemon = INIT_FALL_SPHERE;
   //for(iCurDemon = 0; iCurDemon < INIT_FUNC_NUM; iCurDemon ++) 
   {
     (initList[iCurDemon])(&d1);
@@ -77,30 +71,34 @@ int main(int argc, char *argv[])
     system(cmd);
     sprintf(cmd, "rm out/%s/pov/*.pov", filenameList[iCurDemon]);
     system(cmd);
-    for (unsigned iFrame = 0; iFrame < 6000; iFrame ++) {
-      //printf("%u\n", iFrame);
-      if (iFrame % output_rate == 0) {
-        //sprintf(strFileName, "/home/hammurabi/toShare/demon-1/pov/GroundGranular%03u.pov", iFrame/output_rate);
-        sprintf(strFileName, "out/%s/pov/%03u.pov", filenameList[iCurDemon], iFrame/output_rate);
-        //printf("%f\t%f\t%f\n", d1.sand[0].component[0].position[0], d1.sand[0].component[0].position[1], d1.sand[0].component[0].position[2]);
+    unsigned nFrame = 5*25;
+    unsigned iFrame = 0;
+    for (unsigned iStep = 0; iFrame < nFrame; iStep++) {
+      if (iStep % output_rate == 0) {
+        sprintf(strFileName, "out/%s/pov/%03u.pov", filenameList[iCurDemon], iFrame);
         if( 0 == povSave(&pov1, strFileName)) {
           printf("Can't open file: %s\n", strFileName);
           return -1;
         }
-      }
       /*
       */
+        iFrame++;
+      }
       ComputeForce(&d1);
       /*
-      if (iFrame > 3000) {
-        printf("**********************************\n%04u\n", iFrame);
-        unsigned ig = 26;
+      if (iStep >= 30000 && iStep <= 33280) {
+        printf("**********************************%04u\n", iStep);
+        unsigned ig = 7;
+
         //for (unsigned ig = 0; ig < d1.num; ig ++) {
           GranularPrint(d1.sand+ig);
         //}
       }
       */
       TimeIntergration(&d1);
+      if (d1.sand[7].position[0] != d1.sand[7].position[0]) {
+        printf("%u\n", iStep);
+      }
     }
     FreeDemon(&d1);
   }

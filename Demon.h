@@ -11,11 +11,12 @@ typedef struct
   float max_radius;
   HashTable sand_ht;
   vect vDisplayOffset;
+  vect vGravity;
 } Demon;
 
 void InitDemonHT(Demon*);
 
-void InitDemon2Gran(Demon*);
+void InitDemonCube(Demon*);
 void InitDemonBox(Demon*, const vect, unsigned, unsigned, unsigned);
 
 void InitDemonPush(Demon *dem_ptr);
@@ -36,9 +37,10 @@ void SaveDemon(const Demon * , FILE *);
 void FreeDemon(Demon *);
 
 enum {
-  INIT_PUSH_SHPERE,
-  INIT_FALL_SHPERE,
-  INIT_THROW_SHPERE,
+  INIT_CUBE,
+  INIT_PUSH_SPHERE,
+  INIT_CUBE_BOX,
+  INIT_THROW_SPHERE,
   INIT_GRAN_PULL,
   INIT_GRAN_PLANE,
   INIT_GRAN_PILE,
@@ -51,6 +53,7 @@ enum {
 };
 typedef void (*InitDemonFunc)(Demon *);
 const static InitDemonFunc initList[INIT_FUNC_NUM] = {
+  InitDemonCube,
   InitDemonPush,
   InitDemonFall,
   InitDemonThrow,
@@ -64,6 +67,7 @@ const static InitDemonFunc initList[INIT_FUNC_NUM] = {
   InitDemonGranularBox
 };
 const static char filenameList[INIT_FUNC_NUM][128] = {
+  "demon-cube",
   "demon-push",
   "demon-fall",
   "demon-throw",

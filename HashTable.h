@@ -4,7 +4,6 @@
 #include "vect.h"
 #include "Granular.h"
 #include "common.h"
-#define NULL (0)
 #define P1 (73856093)
 #define P2 (19349663)
 #define P3 (83492791)
@@ -21,7 +20,10 @@
     )%(ts)
 #define HASH_GRID_INIT_CAPACITY (10)
 #define HASH_GRID_INCR_CAPACITY (10)
-typedef unsigned HashContent;
+typedef struct {
+    GranularIndex iGran;
+    ParticleIndex iPart;
+} HashContent;
 //-------------------------------------
 typedef struct  
 {
