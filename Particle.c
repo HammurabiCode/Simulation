@@ -20,6 +20,7 @@ void PartApplyBound(Particle * ip) {
   const static float zBound = 0;
 	float sKesi = 0.0f;
   /*
+  */
 	sKesi = ip->radius + xBound - ip->position[0]; 
 	if(sKesi > 0.0f) {
     vect vContactForce;
@@ -60,7 +61,6 @@ void PartApplyBound(Particle * ip) {
     vContactForce[1] += sNorForce;
     vectAdd(ip->force, vContactForce);
   }
-  */
 	sKesi = ip->radius + zBound - ip->position[2]; 
 	if(sKesi > 0.0f) {
     vect vContactForce;

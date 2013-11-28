@@ -1,3 +1,4 @@
+#include <time.h>
 #include <math.h>
 #include <stdio.h>
 #include "vect.h"
@@ -8,11 +9,8 @@
 
 int main(int argc, char *argv[])
 {
-  vect zero;
-  vectSetZero(zero);
-  float a = vectGetLength(zero);
-  printf("%f\n", abs((int)(a)));
-  if (abs(a) > 0.0f) printf("aaa\n");
+  clock_t start_time, end_time;
+
 	char *strFileName = (char*) malloc(sizeof(char)*1024);
 	
 	Demon d1;
@@ -46,7 +44,7 @@ int main(int argc, char *argv[])
 	povAddLight(&pov1, &light1);
 	povAddInclude(&pov1, "colors");
 
-  unsigned iCurDemon = INIT_CUBE_BOX;
+  unsigned iCurDemon = INIT_INTER_CUBE_GRAN;
   //unsigned iCurDemon = INIT_CUBE;
   //unsigned iCurDemon = INIT_GRAN_2_COLLIDE;
   //unsigned iCurDemon = INIT_GRAN_BOX;
@@ -57,7 +55,10 @@ int main(int argc, char *argv[])
   //unsigned iCurDemon = INIT_FALL_SPHERE;
   //for(iCurDemon = 0; iCurDemon < INIT_FUNC_NUM; iCurDemon ++) 
   {
+    start_time = clock();
     (initList[iCurDemon])(&d1);
+    end_time = clock();
+    printf("time to init:%d-%d=%d\n", end_time, start_time, end_time - start_time);
 
     pov1.dem_scene = &d1;
     unsigned output_rate = (unsigned)(1.0/25.0/d1.time_step);
@@ -84,21 +85,20 @@ int main(int argc, char *argv[])
       */
         iFrame++;
       }
-      ComputeForce(&d1);
-      /*
-      if (iStep >= 30000 && iStep <= 33280) {
-        printf("**********************************%04u\n", iStep);
-        unsigned ig = 7;
 
-        //for (unsigned ig = 0; ig < d1.num; ig ++) {
-          GranularPrint(d1.sand+ig);
-        //}
-      }
-      */
+      start_time = clock();
+
+      ComputeForce(&d1);
+
+      end_time = clock();
+      printf("*****************\n");
+      printf("time to compute force:%d-%d=%d\n", end_time, start_time, end_time - start_time);
+      start_time = clock();
+
       TimeIntergration(&d1);
-      if (d1.sand[7].position[0] != d1.sand[7].position[0]) {
-        printf("%u\n", iStep);
-      }
+
+      end_time = clock();
+      printf("time to time intergration:%d-%d=%d\n", end_time, start_time, end_time - start_time);
     }
     FreeDemon(&d1);
   }

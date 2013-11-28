@@ -83,7 +83,7 @@ void InitGranularCube(unsigned index, Granular *gran, const vect pos,
 
   //--------------------------------
   gran->num = (xNum*yNum + (yNum + xNum - 2)*(zNum-2))*2;
-	gran->mass = PI*r*r*r*4.0/3.0*xNum*yNum*zNum;
+	gran->mass = density*r*r*r*8.0*xNum*yNum*zNum;
   gran->component = (Particle*)malloc(sizeof(Particle)*gran->num);
   gran->offset = (vect*)malloc(sizeof(vect)*gran->num);
   ParticleIndex ip = 0;
@@ -170,7 +170,7 @@ void InitGranularBox(unsigned index, Granular *gran, const vect pos,
   FreeGranular(gran);
 
   gran->num = 9;
-	gran->mass = PI*4.0*(bigR*bigR*bigR + smallR*smallR*smallR*8)/3.0;
+	gran->mass = gran->density*PI*4.0*(bigR*bigR*bigR + smallR*smallR*smallR*8)/3.0;
   gran->component = (Particle*)malloc(sizeof(Particle)*gran->num);
   gran->offset = (vect*)malloc(sizeof(vect)*gran->num);
   InitParticle(gran->component, pos, bigR);

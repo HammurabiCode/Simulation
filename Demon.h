@@ -21,7 +21,7 @@ void InitDemonBox(Demon*, const vect, unsigned, unsigned, unsigned);
 
 void InitDemonPush(Demon *dem_ptr);
 void InitDemonThrow(Demon *dem_ptr);
-void InitDemonFall(Demon *dem_ptr);
+void InitDemonInterCubeGran(Demon *dem_ptr);
 void InitDemonGranPull(Demon *dem_ptr);
 void InitDemonGranPlane(Demon *dem_ptr);
 void InitDemonGranOneShear(Demon *dem_ptr);
@@ -39,7 +39,7 @@ void FreeDemon(Demon *);
 enum {
   INIT_CUBE,
   INIT_PUSH_SPHERE,
-  INIT_CUBE_BOX,
+  INIT_INTER_CUBE_GRAN,
   INIT_THROW_SPHERE,
   INIT_GRAN_PULL,
   INIT_GRAN_PLANE,
@@ -55,7 +55,7 @@ typedef void (*InitDemonFunc)(Demon *);
 const static InitDemonFunc initList[INIT_FUNC_NUM] = {
   InitDemonCube,
   InitDemonPush,
-  InitDemonFall,
+  InitDemonInterCubeGran,
   InitDemonThrow,
   InitDemonGranPull,
   InitDemonGranPlane,
@@ -69,7 +69,7 @@ const static InitDemonFunc initList[INIT_FUNC_NUM] = {
 const static char filenameList[INIT_FUNC_NUM][128] = {
   "demon-cube",
   "demon-push",
-  "demon-fall",
+  "demon-inter-cube-gran",
   "demon-throw",
   "gran-pull",
   "gran-plane",

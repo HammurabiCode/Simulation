@@ -50,10 +50,10 @@ void InitDemonSphereBox(Demon *dem_ptr) {
 }
 //-------------------------------------------------------------------------
 void InitDemonGranularBox(Demon *dem_ptr) {
-  unsigned xNum = 4;
-  unsigned yNum = 4;
-  unsigned zNum = 4;
-  float smallRadius   = 0.1f;
+  unsigned xNum = 10;
+  unsigned yNum = 10;
+  unsigned zNum = 10;
+  float smallRadius   = 0.08f;
   float bigRadius     = 0.2f;
   float granDensity   = 10.0f;
   float dist          = ((smallRadius + bigRadius)/sqrt(3.0)+smallRadius)*2;
@@ -71,6 +71,11 @@ void InitDemonGranularBox(Demon *dem_ptr) {
   for (unsigned ip = 0; ip < dem_ptr->num; ip ++) {
     vect vOffset;
     vectSetValue(vOffset, ((int)(ip%xNum)), ip/xNum%yNum, ip/(xNum*yNum) + 2);
+    if (ip/(xNum*yNum)%2 == 1) {
+      vOffset[0] += 0.25;
+    } else {
+      vOffset[0] -= 0.25;
+    }
     vectScale(vOffset, dist);
     vectAdd(vOffset, vMinPos);
     InitGranularBox(ip, dem_ptr->sand+ip, vOffset, bigRadius, smallRadius, granDensity); 
@@ -302,37 +307,62 @@ void InitDemonThrow(Demon *dem_ptr)
   //InitDemonHT(dem_ptr);
 }
 //-------------------------------------------------------------------------
-void InitDemonFall(Demon *dem_ptr)
+/** Interact between cube & granular
+ * 
+ *
+ */
+void InitDemonInterCubeGran(Demon *dem_ptr)
 {
+  /*
+  unsigned xNum = 10;
+  unsigned yNum = 10;
+  unsigned zNum = 10;
+  */
   unsigned xNum = 4;
   unsigned yNum = 4;
   unsigned zNum = 4;
+  unsigned xCube  = 8;
+  unsigned yCube  = 8;
+  unsigned zCube  = 5;
   float smallRadius   = 0.06f;
   float bigRadius     = 0.2f;
-  float granDensity   = 10.0f;
-  float dist          = ((smallRadius + bigRadius)/sqrt(3.0)+smallRadius)*2;
+  float cubeRadius    = 0.2f;
+  float granDensity   = 5.0f;
+  float cubeDensity   = 4.0f;
+  float diameter      = ((smallRadius + bigRadius)/sqrt(3.0)+smallRadius)*2;
 
   dem_ptr->time_step  = 0.0001f;
   dem_ptr->num        = xNum*yNum*zNum + 1;
   dem_ptr->sand       = (Granular*)malloc(sizeof(Granular)*dem_ptr->num);
   dem_ptr->max_radius = 2*smallRadius + bigRadius;
   vectCopy(dem_ptr->vGravity, GRAVITY);
-  vectSetValue(dem_ptr->vDisplayOffset, -dist/2.0f*xNum, 0, 0);
+  vectSetValue(dem_ptr->vDisplayOffset, 
+      -diameter/2.0f*xNum - cubeRadius*xCube, 0, 0);
   
   vect vMinPos;
-  vectSetValue(vMinPos, dist/2.0f, dist/2.0f, 3.0f);
+  vectSetValue(vMinPos, diameter, diameter/2.0f, diameter/2.0f);
   //--------------------------------
   unsigned ip = 0;
   for (; ip < xNum*yNum*zNum; ip ++) {
     vect vOffset;
-    vectSetValue(vOffset, ((int)(ip%xNum)), ip/xNum%yNum, ip/(xNum*yNum) + 2);
-    vectScale(vOffset, dist);
+    vectSetValue(vOffset, ((int)(ip%xNum)), ip/xNum%yNum, ip/(xNum*yNum));
+    if (ip/(xNum*yNum)%2 == 1) {
+      vOffset[0] += 0.25;
+    } else {
+      vOffset[0] -= 0.25;
+    }
+    vOffset[2] = vOffset[2] + 1;
+    vectScale(vOffset, diameter);
     vectAdd(vOffset, vMinPos);
-    InitGranularBox(ip, dem_ptr->sand+ip, vOffset, bigRadius, smallRadius, granDensity); 
+    InitGranularBox(ip, dem_ptr->sand+ip, 
+        vOffset, bigRadius, smallRadius, granDensity); 
   }
-  vectSetValue(vMinPos, bigRadius*2.0f, bigRadius*2.0f, 1.0f);
-  InitGranularCube(ip, dem_ptr->sand+ip, vMinPos, bigRadius, granDensity,
-      xNum, yNum, zNum); 
+  vectSetValue(vMinPos,
+      cubeRadius*(xCube+2) + diameter*(xNum + 2), 
+      cubeRadius*(yCube+2),
+      cubeRadius*(zCube+1));
+  InitGranularCube(ip, dem_ptr->sand+ip, vMinPos, cubeRadius, cubeDensity,
+      xCube, yCube, zCube); 
   ip++;
   //--------------------------------
   InitDemonHT(dem_ptr);
@@ -378,12 +408,9 @@ void TimeIntergration(Demon *dem_ptr)
 //-------------------------------------------------------------------------
 void ComputeForce(Demon *dem_ptr)
 {
-  const static unsigned MAX_NEI_NUM = 100;
-  GranularIndex *listNei = (GranularIndex*)malloc(sizeof(GranularIndex)*MAX_NEI_NUM);
   unsigned hv[27];
   for(unsigned ig = 0; ig < dem_ptr->num; ig ++) {
     Granular *iGran = dem_ptr->sand + ig;
-    unsigned numNei = 0;
     for (unsigned ip = 0; ip < iGran->num; ip ++) {
       Particle* iPart = iGran->component + ip;
       unsigned num_hv = 0;
@@ -423,7 +450,6 @@ void ComputeForce(Demon *dem_ptr)
       GranApplyBound(iGran);
     }
   }
-  free(listNei);
 }
 //-------------------------------------------------------------------------
 void SaveDemon(const Demon *dem_ptr, FILE *fp)
