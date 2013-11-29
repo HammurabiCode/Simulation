@@ -6,10 +6,13 @@
 typedef struct
 {
   float time_step;
-  unsigned num;
-  Granular *sand;
+  GranularIndex numDRigid;
+  Granular *listDRigid;
+  GranularIndex numSRigid;
+  Granular *listSRigid;
   float max_radius;
-  HashTable sand_ht;
+  HashTable htSRigid;
+  HashTable htDRigid;
   vect vDisplayOffset;
   vect vGravity;
 } Demon;
@@ -20,7 +23,7 @@ void InitDemonCube(Demon*);
 void InitDemonBox(Demon*, const vect, unsigned, unsigned, unsigned);
 
 void InitDemonPush(Demon *dem_ptr);
-void InitDemonThrow(Demon *dem_ptr);
+void InitDemonCubeGran(Demon *dem_ptr);
 void InitDemonInterCubeGran(Demon *dem_ptr);
 void InitDemonGranPull(Demon *dem_ptr);
 void InitDemonGranPlane(Demon *dem_ptr);
@@ -40,7 +43,7 @@ enum {
   INIT_CUBE,
   INIT_PUSH_SPHERE,
   INIT_INTER_CUBE_GRAN,
-  INIT_THROW_SPHERE,
+  INIT_GRAN_CUBE,
   INIT_GRAN_PULL,
   INIT_GRAN_PLANE,
   INIT_GRAN_PILE,
@@ -56,7 +59,7 @@ const static InitDemonFunc initList[INIT_FUNC_NUM] = {
   InitDemonCube,
   InitDemonPush,
   InitDemonInterCubeGran,
-  InitDemonThrow,
+  InitDemonCubeGran,
   InitDemonGranPull,
   InitDemonGranPlane,
   InitDemonGranPile,
@@ -70,7 +73,7 @@ const static char filenameList[INIT_FUNC_NUM][128] = {
   "demon-cube",
   "demon-push",
   "demon-inter-cube-gran",
-  "demon-throw",
+  "demon-cube-gran",
   "gran-pull",
   "gran-plane",
   "gran-pile",

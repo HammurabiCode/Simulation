@@ -22,7 +22,7 @@ void InitGranularTetrahedron(unsigned index, Granular *gran, const vect pos,
 
   //--------------------------------
   gran->num = 4;
-	gran->mass = PI*r*r*r*4.0/3.0*gran->num;
+	gran->mass = PI*r*r*r*4.0/3.0*gran->num*gran->density;
   gran->component = (Particle*)malloc(sizeof(Particle)*gran->num);
   gran->offset = (vect*)malloc(sizeof(vect)*gran->num);
   ParticleIndex ip = 0;
@@ -64,7 +64,40 @@ void InitGranularTetrahedron(unsigned index, Granular *gran, const vect pos,
   }
 	InitGranularInertia(gran);
 }
-void InitGranularCube(unsigned index, Granular *gran, const vect pos,
+void InitCubeGranular(unsigned index, Granular *gran, const vect pos,
+		float r, float density) {
+	gran->index = index;
+	gran->density = density;
+  //--------------------------------
+  //quatenion inertia
+  vectCopy((gran->position), pos);
+  vectSetZero((gran->velocity));
+  vectSetZero((gran->acceleration));
+  vectSetZero((gran->angularVelocity));
+  vectSetZero((gran->angularMomentum));
+	setQuatZero(&(gran->quaternion));
+	gran->quaternion[0] = 1.0f;
+  FreeGranular(gran);
+
+  //--------------------------------
+  ParticleIndex cube_x = 3, cube_y = 2, cube_z = 2;
+  gran->num = cube_x*cube_y*cube_z;
+	gran->mass = r*r*r*8*gran->num*gran->density;
+  gran->component = (Particle*)malloc(sizeof(Particle)*gran->num);
+  gran->offset = (vect*)malloc(sizeof(vect)*gran->num);
+  ParticleIndex ip = 0;
+  for (ip = 0; ip < gran->num; ip ++) {
+    vectSetValue(pos,
+        (TO_INT(ip%cube_x)*2 + 1 - TO_INT(cube_x))*r,
+        (TO_INT((ip/cube_x)%cube_y)*2 + 1 - TO_INT(cube_y))*r,
+        (TO_INT(ip/(cube_x*cube_y))*2 + 1 - TO_INT(cube_z))*r);
+    vectCopy(gran->offset[ip], pos);
+    vectAddTo(pos, gran->position, gran->offset[ip]);
+    InitParticle(gran->component+ip, pos, r);
+  }
+	InitGranularInertia(gran);
+}
+void InitCubeRigid(unsigned index, Granular *gran, const vect pos,
 		float r, float density, unsigned xNum, unsigned yNum, unsigned zNum)
 {
   if (xNum < 2 || yNum < 2 || zNum < 2) return;

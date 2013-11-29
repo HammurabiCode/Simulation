@@ -2,8 +2,6 @@
 #include <math.h>
 #include <stdio.h>
 #include "vect.h"
-#include "coef.h"
-#include "Particle.h"
 #include "Demon.h"
 #include "pov.h"
 
@@ -44,9 +42,10 @@ int main(int argc, char *argv[])
 	povAddLight(&pov1, &light1);
 	povAddInclude(&pov1, "colors");
 
-  unsigned iCurDemon = INIT_INTER_CUBE_GRAN;
+  //unsigned iCurDemon = INIT_INTER_CUBE_GRAN;
   //unsigned iCurDemon = INIT_CUBE;
-  //unsigned iCurDemon = INIT_GRAN_2_COLLIDE;
+  //unsigned iCurDemon = INIT_GRAN_CUBE;
+  unsigned iCurDemon = INIT_GRAN_2_COLLIDE;
   //unsigned iCurDemon = INIT_GRAN_BOX;
   //unsigned iCurDemon = INIT_GRAN_PILE;
   //unsigned iCurDemon = INIT_SPHE_BOX;
@@ -91,14 +90,18 @@ int main(int argc, char *argv[])
       ComputeForce(&d1);
 
       end_time = clock();
+      /*
       printf("*****************\n");
       printf("time to compute force:%d-%d=%d\n", end_time, start_time, end_time - start_time);
+      */
       start_time = clock();
 
       TimeIntergration(&d1);
 
+      /*
       end_time = clock();
       printf("time to time intergration:%d-%d=%d\n", end_time, start_time, end_time - start_time);
+      */
     }
     FreeDemon(&d1);
   }

@@ -1,54 +1,45 @@
-#
-#
-OBJ = main.o vect.o hash.o Particle.o Granular.o Demon.o mat.o quat.o pov.o
-EXECUTABLE = simulation
+OBJ = main.o vect.o HashTable.o Particle.o Granular.o Demon.o mat.o quat.o pov.o
+EXECUTABLE = simulation.exe
+OUT_DIR = ./out
+INC_DIR = ./include
+SRC_DIR = ./src
 C_STD = c99
+CXX = gcc
+CFLAG = -I$(INC_DIR) -std=$(C_STD) -lm 
 .PHONY: clean all
 all : $(EXECUTABLE)
 
 $(EXECUTABLE) : $(OBJ)
-	gcc -o $(EXECUTABLE) $(OBJ) -lm -std=$(C_STD)
-main.o : main.c vect.h Particle.h
-	gcc -o main.o -c main.c -lm -std=$(C_STD)
-hash.o : HashTable.c HashTable.h vect.o Granular.o
-	gcc -o hash.o -c HashTable.c -lm -std=$(C_STD)
-Demon.o : Demon.c Granular.h vect.o Granular.o
-	gcc -o Demon.o -c Demon.c -lm -std=$(C_STD)
-Granular.o : Granular.c Granular.h vect.o Particle.o mat.o
-	gcc -o Granular.o -c Granular.c -lm -std=$(C_STD)
-Particle.o : Particle.c Particle.h coef.h vect.o
-	gcc -o Particle.o -c Particle.c -lm -std=$(C_STD)
-quat.o : quat.c quat.h vect.h vect.o
-	gcc -o quat.o -c quat.c -lm -std=$(C_STD)
-mat.o : mat.c mat.h vect.h vect.o
-	gcc -o mat.o -c mat.c -lm -std=$(C_STD)
-vect.o : vect.c vect.h
-	gcc -o vect.o -c vect.c -lm -std=$(C_STD)
-pov.o : pov.c pov.h vect.h
-	gcc -o pov.o -c pov.c -lm -std=$(C_STD)
+	$(CXX) -o $(OUT_DIR)/$(EXECUTABLE) $(OUT_DIR)/$(OBJ) $(CFLAG)
 
+%.o:$(SRC_DIR)/%.c
+	$(CXX) -c -o $(OUT_DIR)/$@ $^ $(CFLAG)
+clean:
+	rm $(OUT_DIR)*.o *.exe
 
-debug : $(OBJ)
-	gcc -o $(EXECUTABLE) $(OBJ) -lm -std=$(C_STD) -g
-main.o : main.c vect.h Particle.h
-	gcc -o main.o -c main.c -lm -std=$(C_STD) -g
-hash.o : HashTable.c HashTable.h vect.o Granular.o
-	gcc -o hash.o -c HashTable.c -lm -std=$(C_STD) -g
-Demon.o : Demon.c Granular.h vect.o Granular.o
-	gcc -o Demon.o -c Demon.c -lm -std=$(C_STD) -g
-Granular.o : Granular.c Granular.h vect.o Particle.o mat.o
-	gcc -o Granular.o -c Granular.c -lm -std=$(C_STD) -g
-Particle.o : Particle.c Particle.h coef.h vect.o
-	gcc -o Particle.o -c Particle.c -lm -std=$(C_STD) -g
-quat.o : quat.c quat.h vect.h vect.o
-	gcc -o quat.o -c quat.c -lm -std=$(C_STD) -g
-mat.o : mat.c mat.h vect.h vect.o
-	gcc -o mat.o -c mat.c -lm -std=$(C_STD) -g
-vect.o : vect.c vect.h
-	gcc -o vect.o -c vect.c -lm -std=$(C_STD) -g
-pov.o : pov.c pov.h vect.h
-	gcc -o pov.o -c pov.c -lm -std=$(C_STD) -g
+#main.o : $(SRC_DIR)/main.c $(INC_DIR)/vect.h $(INC_DIR)/Demon.h $(INC_DIR)/pov.h
+#	$(CXX) -o $(OUT_DIR)/main.o -c $(SRC_DIR)main.c
 
-clean : 
-	- rm $(OBJ) $(EXECUTABLE) *~ .*.swp
-	- rm pov_out/demon*/pov/*
+#HashTable.o : $(SRC_DIR)/HashTable.c $(INC_DIR)/HashTable.h
+#	$(CXX) -o $(OUT_DIR)/HashTable.o -c $(SRC_DIR)HashTable.c
+
+#Demon.o : $(SRC_DIR)/Demon.c $(INC_DIR)/Granular.h
+#	$(CXX) -o $(OUT_DIR)/Demon.o -c $(SRC_DIR)Demon.c
+#
+#Granular.o : $(SRC_DIR)/Granular.c $(INC_DIR)/Granular.h
+#	$(CXX) -o $(OUT_DIR)/Granular.o -c $(SRC_DIR)Granular.c
+#
+#Particle.o : $(SRC_DIR)/Particle.c $(INC_DIR)/Particle.h $(INC_DIR)/coef.h
+#	$(CXX) -o $(OUT_DIR)/Particle.o -c $(SRC_DIR)/Particle.c
+#
+#quat.o : $(SRC_DIR)/quat.c $(INC_DIR)/quat.h $(INC_DIR)/vect.h
+##	$(CXX) -o $(OUT_DIR)/quat.o -c $(SRC_DIR)/quat.c
+#
+#mat.o : $(SRC_DIR)/mat.c $(INC_DIR)/mat.h $(INC_DIR)/vect.h
+#	$(CXX) -o $(OUT_DIR)/mat.o -c $(SRC_DIR)/mat.c
+#
+#vect.o : $(SRC_DIR)/vect.c $(INC_DIR)/vect.h
+#	$(CXX) -o $(OUT_DIR)/vect.o -c $(SRC_DIR)/vect.c
+#
+#pov.o : $(SRC_DIR)/pov.c $(INC_DIR)/pov.h $(INC_DIR)/vect.h
+#	$(CXX) -o $(OUT_DIR)/pov.o -c $(SRC_DIR)/pov.c

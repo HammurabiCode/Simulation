@@ -6,9 +6,6 @@
 #include "vect.h"
 #include "mat.h"
 #include "quat.h"
-#define  GranularDensity (1.0f)
-#define  BGSmallR (1.0f)
-#define  BGBigR (1.0f)
 
 typedef struct
 {
@@ -34,7 +31,9 @@ typedef struct
 //-------------------------------------
 void InitGranularBox(unsigned index, Granular *gran, const vect pos,
 		float bigR, float smallR, float density);
-void InitGranularCube(unsigned index, Granular *gran, const vect pos,
+void InitCubeGranular(unsigned index, Granular *gran, const vect pos,
+		float r, float density);
+void InitCubeRigid(unsigned index, Granular *gran, const vect pos,
 		float r, float density, unsigned xNum, unsigned yNum, unsigned zNum);
 void InitGranularHPlane(unsigned index, Granular *gran, const vect min_pos,
 		unsigned l, unsigned w, float radius, float density);
